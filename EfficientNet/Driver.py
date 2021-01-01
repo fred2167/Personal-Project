@@ -18,7 +18,7 @@ transformer = transform.Compose([
                                 transform.Normalize((0.5,0.5,0.5),(0.5,0.5,0.5))
 ])
 
-batch_size = 80
+batch_size = 70
 train_dataset = torchvision.datasets.CIFAR10("/home/fred/datasets/",train=True, transform=transformer,download=True)
 train_loader = torch.utils.data.DataLoader(train_dataset,batch_size= batch_size,shuffle=True,num_workers=2,pin_memory=True)
 
@@ -35,15 +35,15 @@ small_dev_loader = torch.utils.data.DataLoader(small_dev_data,batch_size=batch_s
 
 fixrandomseed()
 
-# model = efficientNet(fi=0, num_classes=10)
-# solver = Solver(model, train_loader, dev_loader, print_every_iter= 200, check_every_epoch= 2)
+model = efficientNet(fi=0, num_classes=10)
+solver = Solver(model, train_loader, dev_loader, print_every_iter= 200, check_every_epoch= 2)
 
-# solver.train(lr= 1e-4, epoch= 20, verbose=False, checkpoint_name='test')
-# solver.plot()
-
-solver = Solver.load_checkpoint('test_epoch_20.pt', train_loader, dev_loader)
-solver.train(lr= 5e-5, epoch= 10, verbose=True, checkpoint_name='test20+')
+solver.train(lr= 1e-4, epoch= 30, verbose=False, checkpoint_name='test2')
 solver.plot()
+
+# solver = Solver.load_checkpoint('test20+_epoch_10.pt', train_loader, dev_loader)
+# solver.train(lr= 5e-5, epoch= 10, verbose=True, checkpoint_name='test20+')
+# solver.plot()
 
 
 # fn = efficientNet
