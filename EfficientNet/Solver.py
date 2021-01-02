@@ -5,7 +5,7 @@ import random
 import pickle
 import time
 import math
-from tqdm import trange
+
 
 def fixrandomseed(seed=0):
   '''
@@ -82,22 +82,22 @@ class Solver(object):
 
     self.model.to(**self.to_float_cuda) # model need to be moved before constructing optimizer
     
-    self.optimizer = torch.optim.Adam(model.parameters(), lr=1e-3, eps=self.eps) 
+    self.optimizer = torch.optim.SGD(model.parameters(), lr=1e-3, momentum=0.9,nesterov=True) 
     self.loss_fn = torch.nn.CrossEntropyLoss()
   
 
-  def train(self, epoch, lr=1e-4 , verbose=False, checkpoint_PATH= None):
+  def train(self, epoch, lr=1e-4 , verbose=False, checkpoint_name= None):
     '''
     Inputs:
       - print_every_iter:   print *loss* and *accumilated time* every number of iters, if verbose is also true
       - check_every_epoch:  checkpoint for every number of epoch. See details behaviors in the private checkpoint function
       - verbose:            print initial loss for sanity check, detail loss during training, otherwise, only print stats in checkpoint
-      - checkpoint_PATH:    if not None, will save model and optimizer state_dict at checkpoint
+      - checkpoint_name:    if not None, will save model and optimizer state_dict at checkpoint
     '''
     self.epoch = epoch
     self.lr = lr
     self.verbose = verbose
-    self.checkpoint_PATH = checkpoint_PATH
+    self.checkpoint_name = checkpoint_name
     checkpoint_cycle_flag = True
 
     # can change lr when call train again
@@ -179,8 +179,9 @@ class Solver(object):
         self.stats['train_acc'].append(train_accuracy)
         self.stats['val_acc'].append(val_accuracy)
         self.stats['ratio'].append(ratio)
+        
 
-        if checkpoint_PATH is not None:
+        if checkpoint_name is not None:
           self._save_checkpoint(epoch=i)
 
         if self.tf_board:
@@ -197,13 +198,10 @@ class Solver(object):
     param_norms = 0
     update_norms = 0
     for param in self.model.parameters():
-      if len(param.shape) > 1:
         param_norms += torch.linalg.norm(param)
         update_norms += torch.linalg.norm(param.grad)
 
-    update_norms *= self.lr
-    # print(f'{update_norms:.6f}, {param_norms:.6f}',)
-    return (update_norms / param_norms).item()
+    return (self.lr * update_norms / param_norms).item()
 
   @torch.no_grad()
   def _check_accuracy(self, data_loader, num_sample=None):
@@ -253,7 +251,8 @@ class Solver(object):
       'optimizer_state_dict': self.optimizer.state_dict(),
       'stats':self.stats
     }
-    PATH = f'{self.checkpoint_PATH}_epoch_{epoch}.tar'
+ 
+    PATH = f'{self.checkpoint_name}_epoch_{epoch}.tar'
 
     if self.verbose:
       print(f'Saving checkpoint to "{PATH}"')
@@ -268,21 +267,30 @@ class Solver(object):
     solver = Solver(model, train_loader, val_loader)
     solver.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
     solver.stats = checkpoint['stats']
+    solver.check_every_epoch = checkpoint['stats']['check_every_epoch']
+    solver.print_every_iter = checkpoint['stats']['print_every_iter']
       
     return solver
 
   def plot(self):
-    plt.figure(figsize=(15,5))
-    plt.subplot(121)
+    plt.figure(figsize=(20,5))
+    plt.subplot(131)
     plt.plot(self.stats['epoch_loss'],'oc')
     plt.plot(self.stats['avg_loss'],'-b')
     plt.xlabel('Epoch')
     plt.ylabel('Loss')
 
-    plt.subplot(122)
+    plt.subplot(132)
     plt.plot(self.stats['train_acc'],'-o', label='train')
     plt.plot(self.stats['val_acc'],'-o', label='validation')
     plt.xlabel(f'Every {self.check_every_epoch} Epoch')
     plt.ylabel('Accuracy')
     plt.legend()
+
+    plt.subplot(133)
+    plt.plot(self.stats['ratio'],'o')
+    plt.yscale('log')
+    plt.yticks([1e-2,1e-3,1e-4,1e-5,1e-6],['1e-2','1e-3','1e-4','1e-5','1e-6'])
+    plt.xlabel(f'Every {self.check_every_epoch} Epoch')
+    plt.ylabel('Update Ratios')
     plt.show()
