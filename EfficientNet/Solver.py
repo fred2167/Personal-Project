@@ -86,18 +86,18 @@ class Solver(object):
     self.loss_fn = torch.nn.CrossEntropyLoss()
   
 
-  def train(self, epoch, lr=1e-4 , verbose=False, checkpoint_name= None):
+  def train(self, epoch, lr=1e-4 , verbose=False, checkpoint_PATH= None):
     '''
     Inputs:
       - print_every_iter:   print *loss* and *accumilated time* every number of iters, if verbose is also true
       - check_every_epoch:  checkpoint for every number of epoch. See details behaviors in the private checkpoint function
       - verbose:            print initial loss for sanity check, detail loss during training, otherwise, only print stats in checkpoint
-      - checkpoint_name:    if not None, will save model using pickel at checkpoint
+      - checkpoint_PATH:    if not None, will save model and optimizer state_dict at checkpoint
     '''
     self.epoch = epoch
     self.lr = lr
     self.verbose = verbose
-    self.checkpoint_name = checkpoint_name
+    self.checkpoint_PATH = checkpoint_PATH
     checkpoint_cycle_flag = True
 
     # can change lr when call train again
@@ -180,7 +180,7 @@ class Solver(object):
         self.stats['val_acc'].append(val_accuracy)
         self.stats['ratio'].append(ratio)
 
-        if checkpoint_name is not None:
+        if checkpoint_PATH is not None:
           self._save_checkpoint(epoch=i)
 
         if self.tf_board:
@@ -245,28 +245,30 @@ class Solver(object):
     self.model.train()
     return acc.item()
 
+ 
   def _save_checkpoint(self, epoch):
 
     checkpoint = {
-      'model': self.model,
-      'optim': self.optimizer,
+      'model_state_dict': self.model.state_dict(),
+      'optimizer_state_dict': self.optimizer.state_dict(),
       'stats':self.stats
     }
-    filename = f'{self.checkpoint_name}_epoch_{epoch}.pt'
+    PATH = f'{self.checkpoint_PATH}_epoch_{epoch}.tar'
 
     if self.verbose:
-      print(f'Saving checkpoint to "{filename}"')
+      print(f'Saving checkpoint to "{PATH}"')
 
-    torch.save(checkpoint, filename)
-  
+    torch.save(checkpoint, PATH)
+
   @staticmethod
-  def load_checkpoint(filename, train_loader, val_loader):
-    checkpoint = torch.load(filename)
-    solver = Solver(checkpoint['model'], train_loader, val_loader)
-    solver.optimizer = checkpoint['optim']
+  def load_check_point(PATH, model_fn, model_args, train_loader, val_loader):
+    checkpoint = torch.load(PATH)
+    model = model_fn(**model_args)
+    model.load_state_dict(checkpoint['model_state_dict'])
+    solver = Solver(model, train_loader, val_loader)
+    solver.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
     solver.stats = checkpoint['stats']
-    solver.check_every_epoch = checkpoint['stats']['check_every_epoch']
-    solver.print_every_iter = checkpoint['stats']['print_every_iter']
+      
     return solver
 
   def plot(self):
