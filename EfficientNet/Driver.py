@@ -40,16 +40,16 @@ small_dev_loader = torch.utils.data.DataLoader(small_dev_data,batch_size=batch_s
 fixrandomseed()
 
 # model = efficientNet(fi=0, num_classes=10)
+# checkpoint_PATH = '/home/fred/Python/Personal-Project/EfficientNet/CheckPoints/test2'
 # solver = Solver(model, small_train_loader, small_dev_loader, print_every_iter= 200, check_every_epoch= 2)
-
-# solver.train(lr= 1e-4, epoch= 1, verbose=True, checkpoint_name='/home/fred/Python/Personal-Project/EfficientNet/CheckPoints/test')
+# solver.train(lr= 1e-4, epoch= 1, verbose=True, checkpoint_PATH=checkpoint_PATH)
 # solver.plot()
 
 model_fn = efficientNet
 model_args = {'fi':0, 'num_classes':10}
-PATH = '/home/fred/Python/Personal-Project/EfficientNet/CheckPoints/test_epoch_1.tar'
-solver = Solver.load_check_point(PATH,model_fn, model_args, small_train_loader, small_dev_loader)
-solver.train(lr= 1e-4, epoch= 1, verbose=True, checkpoint_name='/home/fred/Python/Personal-Project/EfficientNet/CheckPoints/test')
+load_path = '/home/fred/Python/Personal-Project/EfficientNet/CheckPoints/test2_epoch_1.tar'
+solver = Solver.load_check_point(load_path, model_fn, model_args, small_train_loader, small_dev_loader)
+solver.train(lr= 1e-4, epoch= 1, verbose=True, checkpoint_PATH=None)
 solver.plot()
 
 
