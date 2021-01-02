@@ -82,6 +82,7 @@ class Solver(object):
 
     self.model.to(**self.to_float_cuda) # model need to be moved before constructing optimizer
     
+    # self.optimizer = torch.optim.Adam(model.parameters(), lr=1e-3, eps=self.eps)
     self.optimizer = torch.optim.SGD(model.parameters(), lr=1e-3, momentum=0.9,nesterov=True) 
     self.loss_fn = torch.nn.CrossEntropyLoss()
   
@@ -192,7 +193,7 @@ class Solver(object):
   @torch.no_grad()
   def _check_update_ratio(self):
     '''
-    Check the ratio between weights and its graidents. NOT tracking bias
+    Check the ratio between weights and its graidents.
     Ideal ratio is around 1e-3
     '''
     param_norms = 0

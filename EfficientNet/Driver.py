@@ -41,7 +41,7 @@ fixrandomseed()
 
 model = efficientNet(fi=0, num_classes=10)
 solver = Solver(model, small_train_loader, small_dev_loader, print_every_iter= 200, check_every_epoch= 2)
-solver.train(lr= 5e-3, epoch= 30, verbose=False, checkpoint_name=None)
+solver.train(lr= 8e-3, epoch= 30, verbose=False, checkpoint_name=None)
 solver.plot()
 
 # model_fn = efficientNet
