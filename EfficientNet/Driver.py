@@ -15,10 +15,10 @@ transformer = transform.Compose([
                                 transform.Resize(256),
                                 transform.CenterCrop(224),
                                 # transform.RandomRotation(90),
-                                # transform.RandomHorizontalFlip(),
-                                # transform.RandomVerticalFlip(),
+                                transform.RandomHorizontalFlip(),
+                                transform.RandomVerticalFlip(),
                                 transform.ToTensor(),
-                                # transform.RandomErasing(),
+                                transform.RandomErasing(),
                                 transform.Normalize((0.5,0.5,0.5),(0.5,0.5,0.5))
 ])
 
@@ -39,17 +39,17 @@ small_dev_loader = torch.utils.data.DataLoader(small_dev_data,batch_size=batch_s
 
 fixrandomseed()
 
-model = efficientNet(fi=0, num_classes=10)
-solver = Solver(model, small_train_loader, small_dev_loader, print_every_iter= 200, check_every_epoch= 2)
-solver.train(lr= 8e-3, epoch= 30, verbose=False, checkpoint_name=None)
-solver.plot()
-
-# model_fn = efficientNet
-# model_args = {'fi':0, 'num_classes':10}
-# load_path = '/home/fred/Python/plot_epoch_10.tar'
-# solver = Solver.load_check_point(load_path, model_fn, model_args, train_loader, dev_loader)
-# solver.train(lr= 5e-5, epoch= 10, verbose=False, checkpoint_name='test20+5+')
+# model = efficientNet(fi=0, num_classes=10)
+# solver = Solver(model, train_loader, dev_loader, print_every_iter= 200, check_every_epoch= 2)
+# solver.train(lr= 8e-3, epoch= 50, verbose=False, checkpoint_name='test3')
 # solver.plot()
+
+model_fn = efficientNet
+model_args = {'fi':0, 'num_classes':10}
+load_path = '/home/fred/Python/test3_50+10+10+_epoch_10.tar'
+solver = Solver.load_check_point(load_path, model_fn, model_args, train_loader, dev_loader)
+solver.train(lr= 7e-4, epoch= 10, verbose=False, checkpoint_name='test4+')
+solver.plot()
 
 
 # fn = efficientNet
