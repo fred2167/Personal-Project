@@ -2,5 +2,5 @@
 ![alt text](https://github.com/fred2167/Personal-Project/blob/master/EfficientNet/CheckPoints/70epoch.png?raw=true)
 
 TODO:
-- [ ] implement stachastic depth and test run time change (w/o 2 min per epoch on CIFAR10)
-
+- [ ] implement stochastic depth and test run time change (w/o 2 min per epoch on CIFAR10)
+- [ ] 
