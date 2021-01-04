@@ -92,7 +92,7 @@ class efficientNet (nn.Module):
     drop_rate = 0.2
 
     stage_1 = nn.Sequential(nn.Conv2d(3,stage_1_param["output_channels"],stage_1_param["kernel_size"],stride=2, padding= 1, bias= False),
-                            nn.BatchNorm2d(stage_1_param["output_channels"]),
+                            nn.BatchNorm2d(stage_1_param["output_channels"],momentum=0.01),
                             nn.ReLU())
     
     stage_2 = MBConv_stage(stage_1_param["output_channels"],stage_2_param["output_channels"],stage_2_param["kernel_size"],stage_2_param["channel_expand_factor"],stage_2_param["num_layers"],drop_rate, stage_2_param["stage_downsample"])
@@ -110,7 +110,7 @@ class efficientNet (nn.Module):
     stage_8 = MBConv_stage(stage_7_param["output_channels"],stage_8_param["output_channels"],stage_8_param["kernel_size"],stage_8_param["channel_expand_factor"],stage_8_param["num_layers"],drop_rate, stage_8_param["stage_downsample"])
     
     stage_9 = nn. Sequential( nn.Conv2d(stage_8_param["output_channels"], stage_9_param["output_channels"], stage_9_param["kernel_size"], bias= False),
-                              nn.BatchNorm2d(stage_9_param["output_channels"]),
+                              nn.BatchNorm2d(stage_9_param["output_channels"],momentum=0.01),
                               nn.ReLU(),
                               nn.AdaptiveAvgPool2d((1,1)),
                               nn.Flatten(),
@@ -191,14 +191,14 @@ class MBConv_block(nn.Module):
 
     self.inv_bottleneck_block = nn.Sequential(
                                               nn.Conv2d(in_channel, intermidiate_channels, kernel_size=1, bias=False),
-                                              nn.BatchNorm2d(intermidiate_channels),
+                                              nn.BatchNorm2d(intermidiate_channels,momentum=0.01),
                                               nn.ReLU(),
                                               nn.Conv2d(intermidiate_channels, intermidiate_channels, kernel_size, stride, pad, groups=intermidiate_channels, bias= False), # Depthwise Conv
-                                              nn.BatchNorm2d(intermidiate_channels),
+                                              nn.BatchNorm2d(intermidiate_channels,momentum=0.01),
                                               nn.ReLU(),
                                               SE_block(intermidiate_channels, channel_expand_factor),
                                               nn.Conv2d(intermidiate_channels, out_channel, kernel_size=1, bias=False),
-                                              nn.BatchNorm2d(out_channel),
+                                              nn.BatchNorm2d(out_channel,momentum=0.01),
                                               )
     
 
