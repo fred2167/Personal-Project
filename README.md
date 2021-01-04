@@ -3,5 +3,5 @@
 
 TODO:
 - [ ] implement stachastic depth and test run time change (w/o 2 min per epoch on CIFAR10)
-- [ ] 
-- [ ] 
+- [ ]  
+- [ ]  
