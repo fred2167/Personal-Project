@@ -41,11 +41,11 @@ to_float_cuda = {"dtype": torch.float16, "device":"cuda"}
 
 model = efficientNet(fi=0, num_classes=10)
 model = model.to(**to_float_cuda)
-optimizer = torch.optim.RMSprop(model.parameters(), momentum=0.9, eps=1e-4,weight_decay=1e-5)
-lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=2, gamma=0.1)
+optimizer = torch.optim.SGD(model.parameters(),lr = 8e-3, momentum=0.9,nesterov=True)
+# lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=2, gamma=0.1)
 
-solver = Solver(model, small_train_loader, small_dev_loader, optimizer, lr_scheduler, print_every_iter= 200, check_every_epoch= 2)
-solver.train(lr= 1e-3, epoch= 5, verbose=False, checkpoint_name=None)
+solver = Solver(model, small_train_loader, small_dev_loader, optimizer, print_every_iter= 200, check_every_epoch= 2)
+solver.train(lr= 8e-3, epoch= 30, verbose=False, checkpoint_name=None)
 solver.plot()
 
 # model_fn = efficientNet

@@ -181,7 +181,7 @@ class MBConv_block(nn.Module):
   def __init__ (self, in_channel, out_channel, kernel_size, drop_rate_= 0.2, channel_expand_factor=6, keepdim=True):
     super().__init__()
     self.drop_rate_ = drop_rate_
-    self.residual = keepdim and in_channel == out_channel
+    self.dimension_not_change = keepdim and in_channel == out_channel
 
     intermidiate_channels = in_channel*channel_expand_factor
     pad = (kernel_size - 1) // 2
@@ -198,19 +198,30 @@ class MBConv_block(nn.Module):
                                               nn.ReLU(),
                                               SE_block(intermidiate_channels, channel_expand_factor),
                                               nn.Conv2d(intermidiate_channels, out_channel, kernel_size=1, bias=False),
-                                              nn.BatchNorm2d(out_channel,momentum=0.01),
+                                              nn.BatchNorm2d(out_channel,momentum=0.01),# match tensorflow default setting/ original paper implementation
                                               )
+
     
 
   def forward (self, x):
+    survival_rate = 0.8
+    bernoulli = torch.distributions.bernoulli.Bernoulli(survival_rate).sample().item()
+    Stochastic_depth_drop = (bernoulli == 0.)
+    # Stochastic depth drop (only during training)
+    if self.training and self.dimension_not_change and Stochastic_depth_drop:
+      return x
     
     output = self.inv_bottleneck_block(x)
 
-    # dropout only using where there is a residual connection
-    if self.residual:
-      return F.dropout(output, self.drop_rate_, self.training)  +  x
-    else:
-      return output
+    # using dropout and residual connection when dimension is not changed
+    if self.dimension_not_change:
+      output = F.dropout(output, self.drop_rate_, self.training)  +  x
+    
+    # during inference will use all layers and down weighted the output by the survival rate
+    if not self.training:
+      output *= survival_rate
+
+    return output
 
 
 class MBConv_stage (nn.Module):
