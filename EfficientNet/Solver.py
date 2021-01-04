@@ -46,15 +46,20 @@ class Solver(object):
 
   '''
 
-  def __init__(self, model, train_loader, val_loader, print_every_iter=200, check_every_epoch=5, fp16= True, tf_board=False, random_seed=0):
+  def __init__(self, model, train_loader, val_loader, optimizer, lr_scheduler= None, print_every_iter=200, check_every_epoch=5, FP16 = True, tf_board=False, random_seed=0):
     '''
     Inputs:
+      - optimizer:          Standard Pytorch optimizer. Will ignore preset learning rate of the optimizer and set new learning rate at *train*
+      - lr_scheduler:       Standard Pytorch lr scheduler
+      - print_every_iter:   print *loss* and *accumilated time* every number of iters, if verbose is also true
+      - check_every_epoch:  checkpoint for every number of epoch. See details behaviors in the private checkpoint function
       - fp16:               if True, both model and data are using torch.float16 to save GPU memory, otherwise using torch.float32.
                             NOTE: when using fp16, Adam optimizer's eps is set to larger than default value to prevent overflow
       - random_seed:        random seed that make output deterministic. See detail in fixrandomseed function
       
     '''
-    self.model = model
+    self.to_float_cuda = {"dtype": torch.float16 if FP16 else torch.float32, "device":"cuda"}
+    self.model = model.to(**self.to_float_cuda)
     self.train_loader = train_loader
     self.val_loader = val_loader
     self.print_every_iter = print_every_iter
@@ -63,7 +68,7 @@ class Solver(object):
 
     # Book keeping variables
     self.stats = {}
-    stats_names = ['epoch_loss', 'avg_loss', 'train_acc', 'val_acc','ratio']
+    stats_names = ['epoch_loss', 'avg_loss', 'train_acc', 'val_acc','ratio', 'lr']
     for name in stats_names:
       self.stats[name] = []
 
@@ -77,31 +82,25 @@ class Solver(object):
     torch.backends.cudnn.benchmark = True
     fixrandomseed(random_seed)
 
-    self.to_float_cuda = {"dtype": torch.float16 if fp16 else torch.float32, "device":"cuda"}
-    self.eps = 1e-5 if fp16 else 1e-8
-
-    self.model.to(**self.to_float_cuda) # model need to be moved before constructing optimizer
-    
-    # self.optimizer = torch.optim.Adam(model.parameters(), lr=1e-3, eps=self.eps)
-    self.optimizer = torch.optim.SGD(model.parameters(), lr=1e-3, momentum=0.9,nesterov=True) 
+    self.optimizer = optimizer
+    self.lr_scheduler = lr_scheduler
     self.loss_fn = torch.nn.CrossEntropyLoss()
   
 
   def train(self, epoch, lr=1e-4 , verbose=False, checkpoint_name= None):
     '''
     Inputs:
-      - print_every_iter:   print *loss* and *accumilated time* every number of iters, if verbose is also true
-      - check_every_epoch:  checkpoint for every number of epoch. See details behaviors in the private checkpoint function
       - verbose:            print initial loss for sanity check, detail loss during training, otherwise, only print stats in checkpoint
       - checkpoint_name:    if not None, will save model and optimizer state_dict at checkpoint
     '''
+
     self.epoch = epoch
     self.lr = lr
     self.verbose = verbose
     self.checkpoint_name = checkpoint_name
     checkpoint_cycle_flag = True
 
-    # can change lr when call train again
+    # can change lr when call train
     if self.optimizer.param_groups[0]['lr'] != lr:
       for p in self.optimizer.param_groups:
         p['lr'] = lr
@@ -137,6 +136,7 @@ class Solver(object):
         loss.backward()
         self.optimizer.step()
 
+
         # print training loss per number of iterations
         if verbose and j % self.print_every_iter == 0:
           print(f"Iteration {j}/{num_batch}, loss = {(total_loss / (j+1)):.5f}, took {(time.time() - start_time):.2f} seconds")
@@ -146,8 +146,7 @@ class Solver(object):
         Y_tr_all.append(Ytr)
         iter_loss_history.append(loss.item())
 
-
-
+    
       avg_loss = total_loss / num_batch
 
       if verbose:
@@ -161,7 +160,7 @@ class Solver(object):
         self.writer.add_scalar('Epoch loss', avg_loss, i)
 
       
-      if i % self.check_every_epoch == 0 or i == epoch:
+      if i % self.check_every_epoch == 0 or i == epoch or i == 1:
         # check train accuracy by using saved results during forward pass
         Y_pred_all = torch.argmax(torch.cat(Y_pred_all),dim=1)
         Y_tr_all = torch.cat(Y_tr_all)
@@ -174,12 +173,14 @@ class Solver(object):
         ratio = self._check_update_ratio()
 
         checkpoint_cycle_flag = True
-        print(f'Epoch: {i}/{epoch}, Loss: {avg_loss:.4f} train acc: {train_accuracy:.4f}, val acc: {val_accuracy:.4f}, update ratio: {ratio:.2e}, took {(time.time()-checkpoint_start_time):.2f} seconds')
+        epoch_lr = self.optimizer.param_groups[0]['lr']
+        print(f'Epoch: {i}/{epoch}, Loss: {avg_loss:.4f} train acc: {train_accuracy:.4f}, val acc: {val_accuracy:.4f}, update ratio: {ratio:.2e}, took {(time.time()-checkpoint_start_time):.2f} seconds, lr: {epoch_lr:.4e}')
 
         # Checkpoint Book keeping
         self.stats['train_acc'].append(train_accuracy)
         self.stats['val_acc'].append(val_accuracy)
         self.stats['ratio'].append(ratio)
+        self.stats['lr'].append(self.lr)
         
 
         if checkpoint_name is not None:
@@ -188,6 +189,11 @@ class Solver(object):
         if self.tf_board:
           self.writer.add_scalar('train_accuracy', train_accuracy, i)
           self.writer.add_scalar('val_accuracy', val_accuracy, i)
+      
+      
+      # decay learning rate after complete one epoch
+      if self.lr_scheduler is not None:
+        self.lr_scheduler.step()
   
 
   @torch.no_grad()
@@ -201,6 +207,7 @@ class Solver(object):
     for param in self.model.parameters():
         param_norms += torch.linalg.norm(param)
         update_norms += torch.linalg.norm(param.grad)
+        break # only check the first layer weights??
 
     return (self.lr * update_norms / param_norms).item()
 
@@ -252,13 +259,13 @@ class Solver(object):
       'optimizer_state_dict': self.optimizer.state_dict(),
       'stats':self.stats
     }
- 
-    PATH = f'{self.checkpoint_name}_epoch_{epoch}.tar'
-
+    val_acc = self.stats['val_acc'][-1]
+    PATH = f'{self.checkpoint_name}_epoch_{epoch}_val_{val_acc:.4f}.tar'
+    torch.save(checkpoint, PATH)
     if self.verbose:
       print(f'Saving checkpoint to "{PATH}"')
 
-    torch.save(checkpoint, PATH)
+    
 
   @staticmethod
   def load_check_point(PATH, model_fn, model_args, train_loader, val_loader):
@@ -270,7 +277,7 @@ class Solver(object):
     solver.stats = checkpoint['stats']
     solver.check_every_epoch = checkpoint['stats']['check_every_epoch']
     solver.print_every_iter = checkpoint['stats']['print_every_iter']
-      
+    print(f'load successfully!! check_every_epoch: {solver.check_every_epoch}, print_every_iter: {solver.print_every_iter}')
     return solver
 
   def plot(self):
@@ -289,9 +296,10 @@ class Solver(object):
     plt.legend()
 
     plt.subplot(133)
-    plt.plot(self.stats['ratio'],'o')
+    plt.plot(self.stats['ratio'],'bo', label='ratio')
+    # plt.plot(self.stats['lr'], 'go', label='lr')
     plt.yscale('log')
     plt.yticks([1e-2,1e-3,1e-4,1e-5,1e-6],['1e-2','1e-3','1e-4','1e-5','1e-6'])
     plt.xlabel(f'Every {self.check_every_epoch} Epoch')
-    plt.ylabel('Update Ratios')
+    plt.legend()
     plt.show()
