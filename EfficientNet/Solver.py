@@ -45,7 +45,7 @@ class Solver(object):
 
   '''
 
-  def __init__(self, model, train_loader, val_loader, optimizer, lr_scheduler= None, print_every_iter=200, check_every_epoch=2, FP16 = True, tf_board=None, random_seed=0):
+  def __init__(self, model, train_loader, val_loader, optimizer, lr_scheduler= None, print_every_iter=200, check_every_epoch=2, FP16 = True, random_seed=0):
     '''
     Inputs:
       - optimizer:          Standard Pytorch optimizer. Will ignore preset learning rate of the optimizer and set new learning rate at *train*
@@ -53,7 +53,6 @@ class Solver(object):
       - print_every_iter:   print *loss* and *accumilated time* every number of iters, if verbose is also true
       - check_every_epoch:  checkpoint for every number of epoch
       - FP16:               Both model and data are using torch.float16 to save GPU memory, otherwise using torch.float32
-      - tf_board:           dictionary of hyperparameters. Using  tensorboard to log hyperparameters, avg epoch loss, train and validation accuracy during checkpoint
       - random_seed:        random seed that make output deterministic. See detail in fixrandomseed function
       
     '''
@@ -63,7 +62,6 @@ class Solver(object):
     self.val_loader = val_loader
     self.print_every_iter = print_every_iter
     self.check_every_epoch = check_every_epoch
-    self.tf_board = tf_board
 
     # Book keeping variables
     self.stats = {}
@@ -84,11 +82,12 @@ class Solver(object):
     self.loss_fn = torch.nn.CrossEntropyLoss()
   
 
-  def train(self, epoch, verbose=False, save_checkpoint= False):
-    '''
+  def train(self, epoch, verbose=False, hparam= None):
+    '''Using  tensorboard to log hyperparameters,  during checkpoint
     Inputs:
       - verbose:            print initial loss for sanity check, detail loss during training, otherwise, only print stats in checkpoint
-      - save_checkpoint:    Will save model and optimizer state_dict at checkpoint and save statistic to tensorboard
+      - hparam:             dictionary of hyperparameters. Will save avg epoch loss, train and validation accuracy to tensorboard.
+                            Will save model and optimizer state dict during checkpoint
     '''
 
 
@@ -96,8 +95,8 @@ class Solver(object):
     self.verbose = verbose
     self.model_start_time = time.ctime()
   
-    if save_checkpoint:
-      self.writer = SummaryWriter('runs/'+self.model_start_time)
+    if hparam:
+      writer = SummaryWriter('runs/'+self.model_start_time)
 
     checkpoint_cycle_flag = True
     num_batch = len(self.train_loader)
@@ -150,9 +149,7 @@ class Solver(object):
       # Epoch Book keeping
       self.stats['epoch_loss'].append(iter_loss_history)
       self.stats['avg_loss'].append(avg_loss)
-
-      if save_checkpoint: 
-        self.writer.add_scalar('Epoch loss', avg_loss, i)
+        
 
       
       if i % self.check_every_epoch == 0 or i == epoch or i == 1:
@@ -177,12 +174,10 @@ class Solver(object):
         self.stats['val_acc'].append(val_accuracy)
         self.stats['ratio'].append(ratio)
         
-          
-
-        
-        if save_checkpoint:
+        if hparam:
+          writer.add_scalar('Epoch loss', avg_loss, i)
+          writer.add_scalars('accuracy', {'train': train_accuracy,'val':val_accuracy}, i)
           self._save_checkpoint(epoch=i)
-          self.writer.add_scalars('accuracy', {'train': train_accuracy,'val':val_accuracy}, i)
 
       
       
@@ -191,11 +186,11 @@ class Solver(object):
         self.lr_scheduler.step()
     
     # end of training book keeping
-    if save_checkpoint and self.tf_board is not None:
+    if hparam:
       metrics = {'accuracy':self.stats['val_acc'][-1], 'loss':self.stats['avg_loss'][-1]}
-      self.writer.add_hparams(self.tf_board, metrics, run_name=self.model_start_time)
-      self.writer.flush()
-      self.writer.close()
+      writer.add_hparams(hparam, metrics, run_name=self.model_start_time)
+      writer.flush()
+      writer.close()
   
 
   @torch.no_grad()

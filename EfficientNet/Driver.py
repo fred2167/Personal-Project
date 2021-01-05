@@ -44,12 +44,12 @@ lr = 8e-3
 epoch = 10
 model = efficientNet(fi=fi, num_classes=10)
 model = model.to(**to_float_cuda)
-hparam = {'lr':lr, 'decay':'cosine', 'optim':'SGD nestrov momentum','bsize':batch_size,'fi':fi}
+hparam = {'epoch':epoch, 'lr':lr, 'decay':'cosine', 'optim':'SGD nestrov momentum','bsize':batch_size,'fi':fi}
 optimizer = torch.optim.SGD(model.parameters(),lr = lr, momentum=0.9,nesterov=True)
 lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer,epoch)
 
-solver = Solver(model, small_train_loader, small_dev_loader, optimizer, lr_scheduler, tf_board=hparam)
-solver.train(epoch= epoch, verbose=False, save_checkpoint=True)
+solver = Solver(model, small_train_loader, small_dev_loader, optimizer, lr_scheduler)
+solver.train(epoch= epoch, verbose=False, hparam= hparam)
 solver.plot()
 
 # model = efficientNet(fi=4, num_classes=10)
