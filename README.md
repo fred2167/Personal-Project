@@ -3,3 +3,5 @@
 
 TODO:
 - [x] implement stochastic depth and test run time change (w/o 2 min per epoch on CIFAR10)
+- [x] refactor tensorboard support
+- [ ] load checkpoint need better logging for tensorboard
