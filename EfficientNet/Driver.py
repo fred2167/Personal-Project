@@ -39,20 +39,26 @@ small_dev_loader = torch.utils.data.DataLoader(small_dev_data,batch_size=batch_s
 fixrandomseed()
 to_float_cuda = {"dtype": torch.float16, "device":"cuda"}
 
-model = efficientNet(fi=0, num_classes=10)
+fi = 0
+lr = 8e-3
+epoch = 10
+model = efficientNet(fi=fi, num_classes=10)
 model = model.to(**to_float_cuda)
-optimizer = torch.optim.SGD(model.parameters(),lr = 8e-3, momentum=0.9,nesterov=True)
-# lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=2, gamma=0.1)
+hparam = {'lr':lr, 'decay':'cosine', 'optim':'SGD nestrov momentum','bsize':batch_size,'fi':fi}
+optimizer = torch.optim.SGD(model.parameters(),lr = lr, momentum=0.9,nesterov=True)
+lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer,epoch)
 
-solver = Solver(model, small_train_loader, small_dev_loader, optimizer, print_every_iter= 200, check_every_epoch= 2)
-solver.train(lr= 8e-3, epoch= 30, verbose=False, checkpoint_name=None)
+solver = Solver(model, small_train_loader, small_dev_loader, optimizer, lr_scheduler, tf_board=hparam)
+solver.train(epoch= epoch, verbose=False, save_checkpoint=True)
 solver.plot()
 
-# model_fn = efficientNet
-# model_args = {'fi':0, 'num_classes':10}
-# load_path = '/home/fred/Python/Sat Jan  2 19:55:37 2021_epoch_20_val_0.8895.tar'
-# solver = Solver.load_check_point(load_path, model_fn, model_args, train_loader, dev_loader)
-# solver.train(lr= 4e-4, epoch= 20, verbose=False, checkpoint_name=time.ctime())
+# model = efficientNet(fi=4, num_classes=10)
+# model = model.to(**to_float_cuda)
+# optimizer = torch.optim.SGD(model.parameters(),lr = 8e-3, momentum=0.9,nesterov=True)
+# lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer,100)
+# load_path = '/home/fred/Python/Mon Jan  4 09:11:12 2021_epoch_94_val_0.9070.tar'
+# solver = Solver.load_check_point(load_path, model, train_loader, dev_loader, optimizer,lr_scheduler)
+# # solver.train(lr= 1e-3, epoch= 1, verbose=True, checkpoint_name=None)
 # solver.plot()
 
 
