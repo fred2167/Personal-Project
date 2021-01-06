@@ -198,18 +198,18 @@ class MBConv_block(nn.Module):
                                               nn.ReLU(),
                                               SE_block(intermidiate_channels, channel_expand_factor),
                                               nn.Conv2d(intermidiate_channels, out_channel, kernel_size=1, bias=False),
-                                              nn.BatchNorm2d(out_channel,momentum=0.01),# match tensorflow default setting/ original paper implementation
+                                              nn.BatchNorm2d(out_channel,momentum=0.01),# momentum match tensorflow default setting/ original paper implementation
                                               )
 
-    
+    self.survival_rate = 0.8
+    self.bernoulli = torch.distributions.bernoulli.Bernoulli(self.survival_rate)
 
   def forward (self, x):
-    survival_rate = 0.8
-    bernoulli = torch.distributions.bernoulli.Bernoulli(survival_rate).sample().item()
-    Stochastic_depth_drop = (bernoulli == 0.)
+
+    # stochastic_depth_drop = (self.bernoulli.sample().item() == 0.)
     # Stochastic depth drop (only during training)
-    if self.training and self.dimension_not_change and Stochastic_depth_drop:
-      return x
+    # if self.training and self.dimension_not_change and stochastic_depth_drop:
+    #   return x
     
     output = self.inv_bottleneck_block(x)
 
@@ -218,8 +218,8 @@ class MBConv_block(nn.Module):
       output = F.dropout(output, self.drop_rate_, self.training)  +  x
     
     # during inference will use all layers and down weighted the output by the survival rate
-    if not self.training:
-      output *= survival_rate
+    # if not self.training:
+    #   output *= self.survival_rate
 
     return output
 
