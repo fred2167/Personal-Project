@@ -29,7 +29,7 @@ def Sampler(model_fn, model_args, train_loader, val_loader, num_model, epoch, lr
     lr = 10 ** random.uniform(lr_lowbound, lr_highbound)
 
     print(f'({i+1}/{num_model})lr: {lr:.4e}', end=' ')
-    solver = Solver(model, train_loader, val_loader, fp16= False)
+    solver = ClassifierSolver(model, train_loader, val_loader, fp16= False)
     solver.train(epoch, lr)
 
 
@@ -38,7 +38,7 @@ class Solver(object):
   '''
   Default/ Hard-coded Behavior:
     Using NVDIA GPU, Cuda, Cudnn
-    loss function = Cross Entropy Loss
+
   '''
 
   def __init__(self, model, train_loader, val_loader, optimizer, lr_scheduler= None, print_every_iter=200, check_every_epoch=2, FP16 = True, random_seed=0, previous_epoch = 0):
@@ -274,21 +274,6 @@ class Solver(object):
 
     
 
-  @staticmethod
-  def load_check_point(PATH, model, train_loader, val_loader, optimizer, lr_scheduler= None):
-    checkpoint = torch.load(PATH)
-
-    model.load_state_dict(checkpoint['model_state_dict'])
-    optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-
-    solver = Solver(model, train_loader, val_loader, optimizer, lr_scheduler, previous_epoch = checkpoint['epoch'])
-    solver.stats = checkpoint['stats']
-    solver.config = checkpoint['config']
-
-    previous_epoch, check_every_epoch, print_every_iter = checkpoint['epoch'], solver.config['check_every_epoch'], solver.config['print_every_iter']
-    print(f'load successfully!! previous epoch: {previous_epoch}, check_every_epoch: {check_every_epoch}, print_every_iter: {print_every_iter}')
-    return solver
-
   def plot(self):
     check_every_epoch = self.config['check_every_epoch']
 
@@ -315,6 +300,7 @@ class Solver(object):
     plt.show()
 
 
+
 class ClassifierSolver(Solver):
   def __init__(self, model, train_loader, val_loader, optimizer, lr_scheduler= None, print_every_iter=200, check_every_epoch=2, FP16 = True, random_seed=0, previous_epoch = 0):
     super().__init__(model, train_loader, val_loader, optimizer, lr_scheduler, print_every_iter, check_every_epoch, FP16, random_seed, previous_epoch)
@@ -330,3 +316,19 @@ class ClassifierSolver(Solver):
     self.optimizer.step()
 
     return loss.item(), y_pred
+
+  @staticmethod
+  def load_check_point(PATH, model, train_loader, val_loader, optimizer, lr_scheduler= None):
+    checkpoint = torch.load(PATH)
+
+    model.load_state_dict(checkpoint['model_state_dict'])
+    optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+
+    solver = ClassifierSolver(model, train_loader, val_loader, optimizer, lr_scheduler, previous_epoch = checkpoint['epoch'])
+    solver.stats = checkpoint['stats']
+    solver.config = checkpoint['config']
+
+    previous_epoch, check_every_epoch, print_every_iter = checkpoint['epoch'], solver.config['check_every_epoch'], solver.config['print_every_iter']
+    print(f'load successfully!! previous epoch: {previous_epoch}, check_every_epoch: {check_every_epoch}, print_every_iter: {print_every_iter}')
+    return solver
+  
