@@ -194,7 +194,7 @@ class Solver(object):
 
     # end of training book keeping
     if hparam:
-      metrics = {'accuracy':self.stats['val_acc'][-1], 'loss':self.stats['avg_loss'][-1]}
+      metrics = {'hparam/accuracy':self.stats['val_acc'][-1], 'hparam/loss':self.stats['avg_loss'][-1]}
       writer.add_hparams(hparam, metrics, run_name=self.model_start_time)
       writer.flush()
       writer.close()
@@ -218,6 +218,9 @@ class Solver(object):
   @torch.no_grad()
   def _check_accuracy(self, data_loader, num_sample=None):
     '''
+    TODO:
+    - Want randomly pick data to calculate accuracy? is making it more deterministic better?
+
     if num_sample is provided, will sub sample data loader to the designated amount of samples and double the batch size for efficency.
     (Can double the batch size during evaluation since no grads are needed)
     Inputs:
@@ -226,8 +229,7 @@ class Solver(object):
     Outputs:
       - acc:            float, accuracy of the dataloader
     
-    TODO:
-    - Want randomly pick data to calculate accuracy? is making it more deterministic better?
+    
     '''
     self.model.eval()
 
