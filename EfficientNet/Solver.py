@@ -100,7 +100,7 @@ class Solver(object):
     epoch += self.previous_epoch # for load previous model
     self.verbose = verbose
     self.model_start_time = time.ctime()
-  
+    self.hparam = hparam
     if hparam:
       writer = SummaryWriter('runs/'+self.model_start_time)
 
@@ -194,10 +194,12 @@ class Solver(object):
 
     # end of training book keeping
     if hparam:
-      metrics = {'hparam/accuracy':self.stats['val_acc'][-1], 'hparam/loss':self.stats['avg_loss'][-1]}
+      metrics = {'Val Accuracy':self.stats['val_acc'][-1], 'Final Loss':self.stats['avg_loss'][-1]}
       writer.add_hparams(hparam, metrics, run_name=self.model_start_time)
+      writer.add_figure(str(hparam), self.plot())
       writer.flush()
       writer.close()
+      
   
 
   @torch.no_grad()
@@ -264,7 +266,8 @@ class Solver(object):
       'optimizer_state_dict': self.optimizer.state_dict(),
       'epoch':epoch,
       'stats':self.stats,
-      'config':self.config
+      'config':self.config,
+      'hparam':self.hparam
     }
     val_acc = self.stats['val_acc'][-1]
     PATH = f'runs/{self.model_start_time}/{self.model_start_time}_epoch_{epoch}_val_{val_acc:.4f}.tar'
@@ -274,12 +277,30 @@ class Solver(object):
     if self.verbose:
       print(f'Saving checkpoint to "{PATH}"')
 
+  @staticmethod
+  def load_check_point(PATH, model, train_loader, val_loader, optimizer, lr_scheduler= None):
+    '''
+    Template function for future sub-class.
+    '''
+    checkpoint = torch.load(PATH)
+
+    model.load_state_dict(checkpoint['model_state_dict'])
+    optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+
+    solver = Solver(model, train_loader, val_loader, optimizer, lr_scheduler, previous_epoch = checkpoint['epoch'])
+    solver.stats = checkpoint['stats']
+    solver.config = checkpoint['config']
+
+    previous_epoch, check_every_epoch, print_every_iter = checkpoint['epoch'], solver.config['check_every_epoch'], solver.config['print_every_iter']
+    print(f'load successfully!! previous epoch: {previous_epoch}, check_every_epoch: {check_every_epoch}, print_every_iter: {print_every_iter}')
+    return solver
+
     
 
   def plot(self):
     check_every_epoch = self.config['check_every_epoch']
 
-    plt.figure(figsize=(20,5))
+    fig = plt.figure(figsize=(20,5))
     plt.subplot(131)
     plt.plot(self.stats['iter_loss'],'oc')
     plt.plot(self.stats['avg_loss'],'-b')
@@ -300,6 +321,8 @@ class Solver(object):
     plt.xlabel(f'Every {check_every_epoch} Epoch')
     plt.legend()
     plt.show()
+
+    return fig
 
 
 
