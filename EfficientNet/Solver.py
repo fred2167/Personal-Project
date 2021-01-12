@@ -179,6 +179,7 @@ class Solver(object):
         
         if hparam:
           writer.add_scalar('Epoch loss', avg_loss, i)
+          writer.add_scalar('lr', cur_lr, i)
           writer.add_scalars('accuracy', {'train': train_accuracy,'val':val_accuracy}, i)
 
           # only save model checkpoint after half of the training process
@@ -343,11 +344,13 @@ class ClassifierSolver(Solver):
     return loss.item(), y_pred
 
   @staticmethod
-  def load_check_point(PATH, model, train_loader, val_loader, optimizer, lr_scheduler= None):
+  def load_check_point(PATH, model, train_loader, val_loader, optimizer, lr, lr_scheduler= None):
     checkpoint = torch.load(PATH)
 
     model.load_state_dict(checkpoint['model_state_dict'])
     optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+    for p in optimizer.param_groups:
+      p['lr'] = lr
 
     solver = ClassifierSolver(model, train_loader, val_loader, optimizer, lr_scheduler, previous_epoch = checkpoint['epoch'])
     solver.stats = checkpoint['stats']

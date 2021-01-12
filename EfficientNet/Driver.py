@@ -17,7 +17,7 @@ transformer = transform.Compose([
                                 transform.RandomHorizontalFlip(),
                                 transform.RandomVerticalFlip(),
                                 transform.ToTensor(),
-                                transform.RandomErasing(),
+                                # transform.RandomErasing(),
                                 transform.Normalize((0.5,0.5,0.5),(0.5,0.5,0.5))
 ])
 
@@ -40,23 +40,25 @@ fixrandomseed()
 to_float_cuda = {"dtype": torch.float16, "device":"cuda"}
 
 fi = 0
-lr = 8e-3
+lr = 1e-4
 epoch = 20
 model = efficientNet(fi=fi, num_classes=10)
 model = model.to(**to_float_cuda)
-hparam = {'epoch':epoch, 'optim':'Adam', 'lr':lr, 'decay': 'None', 'bsize':batch_size,'fi':fi, 'Note': ' '}
-# optimizer = torch.optim.SGD(model.parameters(),lr = lr, momentum=0.9,nesterov=True)
-optimizer = torch.optim.Adam(model.parameters(), lr= lr, eps=1e-4)
-lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer,epoch)
+
+optimizer = torch.optim.SGD(model.parameters(),lr = lr, momentum=0.9,nesterov=True)
+# optimizer = torch.optim.Adam(model.parameters(), lr= lr, eps=1e-4)
+
+# lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer,epoch)
+
+hparam = {'epoch':epoch, 'optim':'SGD', 'lr':lr, 'decay': 'Cosine', 'bsize':batch_size,'fi':fi, 'Note': ' '}
+
+# solver = ClassifierSolver(model, train_loader, dev_loader, optimizer)
+# solver.train(epoch= epoch, verbose=False, hparam= hparam)
+# solver.plot()
 
 
-solver = ClassifierSolver(model, train_loader, dev_loader, optimizer)
-solver.train(epoch= epoch, verbose=False, hparam= hparam)
-solver.plot()
-
-
-# load_path = '/home/fred/Python/runs/Wed Jan  6 18:51:24 2021/Wed Jan  6 18:51:24 2021_epoch_10_val_0.0700.tar'
-# solver = ClassifierSolver.load_check_point(load_path, model, small_train_loader, small_dev_loader, optimizer,lr_scheduler)
+# load_path = '/home/fred/Python/runs/Sat Jan  9 18:52:43 2021/Sat Jan  9 18:52:43 2021_epoch_50_val_0.7839.tar'
+# solver = ClassifierSolver.load_check_point(load_path, model, train_loader, dev_loader, optimizer, lr)
 # solver.train(epoch= epoch, verbose=False, hparam= hparam)
 # solver.plot()
 
