@@ -7,7 +7,7 @@ import pickle
 import time
 import math
 from tqdm import tqdm, trange
-from model import efficientNet
+
 
 
 def fixrandomseed(seed=0):
@@ -32,9 +32,8 @@ def Sampler(model_fn, model_args, train_loader, val_loader, num_model, epoch, lr
     lr = 10 ** random.uniform(lr_lowbound, lr_highbound)
 
     model = model_fn(**model_args).to(**to_float_cuda)
-    optimizer = torch.optim.SGD(model.parameters(),lr=lr, momentum=0.9, nesterov=True)
+    optimizer = torch.optim.Adam(model.parameters(),lr=lr)
     
-
     solver = ClassifierSolver(model, train_loader, val_loader, optimizer,None, epoch)
     solver.train(epoch)
     
@@ -272,9 +271,9 @@ class Solver(object):
     torch.save(checkpoint, PATH)
 
   @staticmethod
-  def load_check_point(PATH, model, train_loader, val_loader, optimizer, lr, lr_scheduler= None):
+  def load_check_point(INSTANCE, PATH, model, train_loader, val_loader, optimizer, lr, lr_scheduler= None):
     '''
-    Template function for future sub-class.
+    Sub-class should overload this method with INSTANCE
     '''
     checkpoint = torch.load(PATH)
 
@@ -285,7 +284,7 @@ class Solver(object):
     for p in optimizer.param_groups:
       p['lr'] = lr
 
-    solver = Solver(model, train_loader, val_loader, optimizer, lr_scheduler, previous_epoch = checkpoint['epoch'])
+    solver = INSTANCE(model, train_loader, val_loader, optimizer, lr_scheduler, previous_epoch = checkpoint['epoch'])
     solver.scaler.load_state_dict(checkpoint['scaler_state_dict'])
     solver.stats = checkpoint['stats']
     solver.config = checkpoint['config']
@@ -346,24 +345,4 @@ class ClassifierSolver(Solver):
 
   @staticmethod
   def load_check_point(PATH, model, train_loader, val_loader, optimizer, lr, lr_scheduler= None):
-    '''
-    Template function for future sub-class.
-    '''
-    checkpoint = torch.load(PATH)
-
-    model.load_state_dict(checkpoint['model_state_dict'])
-    optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-    
-    #overide the learning rate in old optimizer
-    for p in optimizer.param_groups:
-      p['lr'] = lr
-
-    solver = ClassifierSolver(model, train_loader, val_loader, optimizer, lr_scheduler, previous_epoch = checkpoint['epoch'])
-    solver.scaler.load_state_dict(checkpoint['scaler_state_dict'])
-    solver.stats = checkpoint['stats']
-    solver.config = checkpoint['config']
-    
-
-    previous_epoch, check_every_epoch = checkpoint['epoch'], solver.config['check_every_epoch']
-    print(f'load successfully!! previous epoch: {previous_epoch}, check_every_epoch: {check_every_epoch}')
-    return solver
+    return Solver.load_check_point(ClassifierSolver, PATH, model, train_loader, val_loader, optimizer, lr, lr_scheduler)
