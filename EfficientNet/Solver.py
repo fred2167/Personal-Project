@@ -1,10 +1,12 @@
 import torch
+from torch.cuda import amp
 from torch.utils.tensorboard import SummaryWriter
 import matplotlib.pyplot as plt
 import random
 import pickle
 import time
 import math
+from tqdm import tqdm, trange
 
 
 def fixrandomseed(seed=0):
@@ -38,10 +40,9 @@ class Solver(object):
   '''
   Default/ Hard-coded Behavior:
     Using NVDIA GPU, Cuda, Cudnn
-
   '''
 
-  def __init__(self, model, train_loader, val_loader, optimizer, lr_scheduler= None, print_every_iter=200, check_every_epoch=2, FP16 = True, random_seed=0, previous_epoch = 0):
+  def __init__(self, model, train_loader, val_loader, optimizer, lr_scheduler= None, print_every_iter=200, check_every_epoch=2, random_seed=0, previous_epoch = 0):
     '''
     Inputs:
       - optimizer:          Standard Pytorch optimizer. Will ignore preset learning rate of the optimizer and set new learning rate at *train*
@@ -52,7 +53,7 @@ class Solver(object):
       - random_seed:        random seed that make output deterministic. See detail in fixrandomseed function
       
     '''
-    self.to_float_cuda = {"dtype": torch.float16 if FP16 else torch.float32, "device":"cuda"}
+    self.to_float_cuda = {"dtype": torch.float32, "device":"cuda"}
     self.model = model.to(**self.to_float_cuda)
     self.train_loader = train_loader
     self.val_loader = val_loader
@@ -75,14 +76,12 @@ class Solver(object):
     torch.backends.cudnn.benchmark = True
     fixrandomseed(random_seed)
   
-  def fit(self, Xtr, Ytr):
+  def train_fn(self, Xtr, Ytr):
     '''
     TODO: elimiate the need to output y_pred, need to test memory footprint
-
     Function that all sub class need to implement
     Input:
       - Xtr, Ytr:   Training data and labels that are given by dataloader as ONE small batch
-
     Outputs: (**Order Matters**)
       - loss:       scalar, One iteration loss
       - y_pred:     prediction that that are made by the model. Have to be the same size and shape with Ytr
@@ -101,6 +100,7 @@ class Solver(object):
     self.verbose = verbose
     self.model_start_time = time.ctime()
     self.hparam = hparam
+    self.scaler = amp.GradScaler()
     if hparam:
       writer = SummaryWriter('runs/'+self.model_start_time)
 
@@ -119,16 +119,16 @@ class Solver(object):
         checkpoint_cycle_flag = False
         checkpoint_start_time = time.time()
 
-
-      for j, data in enumerate(self.train_loader):
+      for j, data in zip(s:= trange(num_batch),self.train_loader):
         
+        s.set_description(f'Epoch {i}/{epoch}')
 
         Xtr, Ytr = data
         Xtr, Ytr = Xtr.to(**self.to_float_cuda), Ytr.cuda()
 
         ################################## Future changes ##########################################################
 
-        loss, y_pred = self.fit(Xtr, Ytr)
+        loss, y_pred = self.train_fn(Xtr, Ytr)
 
         ############################################################################################################
 
@@ -142,6 +142,8 @@ class Solver(object):
         Y_pred_all.append(y_pred)
         Y_tr_all.append(Ytr)
         iter_loss_history.append(loss)
+
+        s.set_postfix(loss=loss)
 
     
       avg_loss = total_loss / num_batch
@@ -179,7 +181,6 @@ class Solver(object):
         
         if hparam:
           writer.add_scalar('Epoch loss', avg_loss, i)
-          writer.add_scalar('lr', cur_lr, i)
           writer.add_scalars('accuracy', {'train': train_accuracy,'val':val_accuracy}, i)
 
           # only save model checkpoint after half of the training process
@@ -223,7 +224,6 @@ class Solver(object):
     '''
     TODO:
     - Want randomly pick data to calculate accuracy? is making it more deterministic better?
-
     if num_sample is provided, will sub sample data loader to the designated amount of samples and double the batch size for efficency.
     (Can double the batch size during evaluation since no grads are needed)
     Inputs:
@@ -265,6 +265,7 @@ class Solver(object):
     checkpoint = {
       'model_state_dict': self.model.state_dict(),
       'optimizer_state_dict': self.optimizer.state_dict(),
+      'scaler_state_dict':self.scaler.state_dict(),
       'epoch':epoch,
       'stats':self.stats,
       'config':self.config,
@@ -279,7 +280,7 @@ class Solver(object):
       print(f'Saving checkpoint to "{PATH}"')
 
   @staticmethod
-  def load_check_point(PATH, model, train_loader, val_loader, optimizer, lr_scheduler= None):
+  def load_check_point(PATH, model, train_loader, val_loader, optimizer, lr, lr_scheduler= None):
     '''
     Template function for future sub-class.
     '''
@@ -287,6 +288,10 @@ class Solver(object):
 
     model.load_state_dict(checkpoint['model_state_dict'])
     optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+    
+    #overide the learning rate in old optimizer
+    for p in optimizer.param_groups:
+      p['lr'] = lr
 
     solver = Solver(model, train_loader, val_loader, optimizer, lr_scheduler, previous_epoch = checkpoint['epoch'])
     solver.stats = checkpoint['stats']
@@ -328,18 +333,20 @@ class Solver(object):
 
 
 class ClassifierSolver(Solver):
-  def __init__(self, model, train_loader, val_loader, optimizer, lr_scheduler= None, print_every_iter=200, check_every_epoch=2, FP16 = True, random_seed=0, previous_epoch = 0):
-    super().__init__(model, train_loader, val_loader, optimizer, lr_scheduler, print_every_iter, check_every_epoch, FP16, random_seed, previous_epoch)
+  def __init__(self, model, train_loader, val_loader, optimizer, lr_scheduler= None, print_every_iter=200, check_every_epoch=2, random_seed=0, previous_epoch = 0):
+    super().__init__(model, train_loader, val_loader, optimizer, lr_scheduler, print_every_iter, check_every_epoch, random_seed, previous_epoch)
 
-  def fit(self, Xtr, Ytr):
+  def train_fn(self, Xtr, Ytr):
 
-    y_pred = self.model(Xtr)
-    loss = torch.nn.CrossEntropyLoss()(y_pred,Ytr)
+    with amp.autocast():
+      y_pred = self.model(Xtr)
+      loss = torch.nn.CrossEntropyLoss()(y_pred,Ytr)
 
     self.model.zero_grad(set_to_none=True)
     
-    loss.backward()
-    self.optimizer.step()
+    self.scaler.scale(loss).backward()
+    self.scaler.step(self.optimizer)
+    self.scaler.update()
 
     return loss.item(), y_pred
 
@@ -349,6 +356,8 @@ class ClassifierSolver(Solver):
 
     model.load_state_dict(checkpoint['model_state_dict'])
     optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+
+    #overide the learning rate in old optimizer
     for p in optimizer.param_groups:
       p['lr'] = lr
 
@@ -359,4 +368,3 @@ class ClassifierSolver(Solver):
     previous_epoch, check_every_epoch, print_every_iter = checkpoint['epoch'], solver.config['check_every_epoch'], solver.config['print_every_iter']
     print(f'load successfully!! previous epoch: {previous_epoch}, check_every_epoch: {check_every_epoch}, print_every_iter: {print_every_iter}')
     return solver
-  

@@ -21,7 +21,7 @@ transformer = transform.Compose([
                                 transform.Normalize((0.5,0.5,0.5),(0.5,0.5,0.5))
 ])
 
-batch_size = 80
+batch_size = 40
 train_dataset = torchvision.datasets.CIFAR10("/home/fred/datasets/",train=True, transform=transformer,download=True)
 train_loader = torch.utils.data.DataLoader(train_dataset,batch_size= batch_size,shuffle=True,num_workers=2,pin_memory=True)
 
@@ -37,24 +37,24 @@ small_dev_loader = torch.utils.data.DataLoader(small_dev_data,batch_size=batch_s
 
 
 fixrandomseed()
-to_float_cuda = {"dtype": torch.float16, "device":"cuda"}
+to_float_cuda = {"dtype": torch.float32, "device":"cuda"}
 
 fi = 0
-lr = 1e-4
-epoch = 20
+lr = 5e-3
+epoch = 10
 model = efficientNet(fi=fi, num_classes=10)
 model = model.to(**to_float_cuda)
 
-optimizer = torch.optim.SGD(model.parameters(),lr = lr, momentum=0.9,nesterov=True)
-# optimizer = torch.optim.Adam(model.parameters(), lr= lr, eps=1e-4)
+# optimizer = torch.optim.SGD(model.parameters(),lr = lr, momentum=0.9,nesterov=True)
+optimizer = torch.optim.Adam(model.parameters(), lr= lr, eps=1e-4)
 
 # lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer,epoch)
 
-hparam = {'epoch':epoch, 'optim':'SGD', 'lr':lr, 'decay': 'Cosine', 'bsize':batch_size,'fi':fi, 'Note': ' '}
+hparam = {'epoch':epoch, 'optim':'Adam', 'lr':lr, 'decay': 'None', 'bsize':batch_size,'fi':fi, 'Note': ' '}
 
-# solver = ClassifierSolver(model, train_loader, dev_loader, optimizer)
-# solver.train(epoch= epoch, verbose=False, hparam= hparam)
-# solver.plot()
+solver = ClassifierSolver(model, small_train_loader, small_dev_loader, optimizer)
+solver.train(epoch= epoch, verbose=False, hparam= None)
+solver.plot()
 
 
 # load_path = '/home/fred/Python/runs/Sat Jan  9 18:52:43 2021/Sat Jan  9 18:52:43 2021_epoch_50_val_0.7839.tar'
