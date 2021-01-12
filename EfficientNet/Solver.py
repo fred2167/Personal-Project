@@ -7,6 +7,7 @@ import pickle
 import time
 import math
 from tqdm import tqdm, trange
+from model import efficientNet
 
 
 def fixrandomseed(seed=0):
@@ -25,14 +26,18 @@ def Sampler(model_fn, model_args, train_loader, val_loader, num_model, epoch, lr
     - model_args: model arguments
     - num_model: number of models for sampling
   '''
+  to_float_cuda = {"dtype": torch.float32, "device":"cuda"}
 
   for i in range(num_model):
-    model = model_fn(**model_args)
     lr = 10 ** random.uniform(lr_lowbound, lr_highbound)
 
-    print(f'({i+1}/{num_model})lr: {lr:.4e}', end=' ')
-    solver = ClassifierSolver(model, train_loader, val_loader, fp16= False)
-    solver.train(epoch, lr)
+    model = model_fn(**model_args).to(**to_float_cuda)
+    optimizer = torch.optim.SGD(model.parameters(),lr=lr, momentum=0.9, nesterov=True)
+    
+
+    solver = ClassifierSolver(model, train_loader, val_loader, optimizer,None, epoch)
+    solver.train(epoch)
+    
 
 
 
@@ -48,8 +53,7 @@ class Solver(object):
       - optimizer:          Standard Pytorch optimizer. Will ignore preset learning rate of the optimizer and set new learning rate at *train*
       - lr_scheduler:       Standard Pytorch lr scheduler
       - check_every_epoch:  checkpoint for every number of epoch
-      - FP16:               Both model and data are using torch.float16 to save GPU memory, otherwise using torch.float32
-      - random_seed:        random seed that make output deterministic. See detail in fixrandomseed function
+      - :        random seed that make output deterministic. See detail in fixrandomseed function
       
     '''
     self.to_float_cuda = {"dtype": torch.float32, "device":"cuda"}
@@ -92,7 +96,7 @@ class Solver(object):
     Inputs:
       - hparam:             dictionary of hyperparameters. 
                             Save average epoch loss, train and validation accuracy to tensorboard.
-                            After half of the training epoch, save model and optimizer state dict, current epoch, stats and config during checkpoint 
+                            After half of the training epoch, save model, optimizer ,and scalar state dict, current epoch, stats and config during checkpoint 
     '''
     epoch += self.previous_epoch # for load previous model
     self.model_start_time = time.ctime()
@@ -147,7 +151,7 @@ class Solver(object):
         
 
       # Enter checkpoint block after first and last epoch and specify checkpoint interval
-      if i % self.config['check_every_epoch'] == 0 or i == epoch or i == 1:
+      if i % self.config['check_every_epoch'] == 0 or i == epoch:
         checkpoint_cycle_flag = True
         cur_lr = self.optimizer.param_groups[0]['lr']
 
