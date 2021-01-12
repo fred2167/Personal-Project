@@ -42,12 +42,11 @@ class Solver(object):
     Using NVDIA GPU, Cuda, Cudnn
   '''
 
-  def __init__(self, model, train_loader, val_loader, optimizer, lr_scheduler= None, print_every_iter=200, check_every_epoch=2, random_seed=0, previous_epoch = 0):
+  def __init__(self, model, train_loader, val_loader, optimizer, lr_scheduler= None, check_every_epoch=2, random_seed=0, previous_epoch = 0):
     '''
     Inputs:
       - optimizer:          Standard Pytorch optimizer. Will ignore preset learning rate of the optimizer and set new learning rate at *train*
       - lr_scheduler:       Standard Pytorch lr scheduler
-      - print_every_iter:   print *loss* and *accumilated time* every number of iters, if verbose is also true
       - check_every_epoch:  checkpoint for every number of epoch
       - FP16:               Both model and data are using torch.float16 to save GPU memory, otherwise using torch.float32
       - random_seed:        random seed that make output deterministic. See detail in fixrandomseed function
@@ -59,12 +58,12 @@ class Solver(object):
     self.val_loader = val_loader
     self.optimizer = optimizer
     self.lr_scheduler = lr_scheduler
+    self.scaler = amp.GradScaler()
 
     self.previous_epoch = previous_epoch
 
     # Book keeping variables
     self.config = {}
-    self.config['print_every_iter'] = print_every_iter
     self.config['check_every_epoch'] = check_every_epoch
 
     self.stats = {}
@@ -88,19 +87,17 @@ class Solver(object):
     '''
     raise NotImplementedError
 
-  def train(self, epoch, verbose=False, hparam= None):
+  def train(self, epoch, hparam= None):
     '''
     Inputs:
-      - verbose:            Print detail loss during training, otherwise, only print stats during checkpoints
       - hparam:             dictionary of hyperparameters. 
                             Save average epoch loss, train and validation accuracy to tensorboard.
                             After half of the training epoch, save model and optimizer state dict, current epoch, stats and config during checkpoint 
     '''
     epoch += self.previous_epoch # for load previous model
-    self.verbose = verbose
     self.model_start_time = time.ctime()
-    self.hparam = hparam
-    self.scaler = amp.GradScaler()
+    self.config['hparam'] = hparam
+
     if hparam:
       writer = SummaryWriter('runs/'+self.model_start_time)
 
@@ -114,14 +111,13 @@ class Solver(object):
       iter_loss_history = []
       Y_pred_all = []
       Y_tr_all = []
-      epoch_start_time = time.time()
+
       if checkpoint_cycle_flag:
         checkpoint_cycle_flag = False
         checkpoint_start_time = time.time()
 
-      for j, data in zip(s:= trange(num_batch),self.train_loader):
+      for j, data in zip(s:= trange(num_batch, leave=False),self.train_loader):
         
-        s.set_description(f'Epoch {i}/{epoch}')
 
         Xtr, Ytr = data
         Xtr, Ytr = Xtr.to(**self.to_float_cuda), Ytr.cuda()
@@ -133,23 +129,17 @@ class Solver(object):
         ############################################################################################################
 
         total_loss += loss
-
-        # print training loss per number of iterations
-        if verbose and j % self.config['print_every_iter'] == 0:
-          print(f"Iteration {j}/{num_batch}, loss = {(total_loss / (j+1)):.5f}, took {(time.time() - epoch_start_time):.2f} seconds")
         
         # Iter Book keeping
         Y_pred_all.append(y_pred)
         Y_tr_all.append(Ytr)
         iter_loss_history.append(loss)
 
-        s.set_postfix(loss=loss)
+        # update progress bar
+        s.set_description(f'Epoch {i}/{epoch} Loss: {loss:.4f} ')
 
     
       avg_loss = total_loss / num_batch
-
-      if verbose:
-        print(f"Epoch: {i}/{epoch}, loss = {avg_loss:.5f}, took {time.time() - epoch_start_time:.2f} seconds")
 
       # Epoch Book keeping
       self.stats['iter_loss'].append(iter_loss_history)
@@ -196,8 +186,8 @@ class Solver(object):
 
     # end of training book keeping
     if hparam:
-      metrics = {'Val Accuracy':self.stats['val_acc'][-1], 'Final Loss':self.stats['avg_loss'][-1]}
-      writer.add_hparams(hparam, metrics, run_name=self.model_start_time)
+      metrics = {'Val Accuracy':self.stats['val_acc'][-1], 'Loss':self.stats['avg_loss'][-1]}
+      writer.add_hparams(hparam, metrics, run_name='hparam')
       writer.add_figure(str(hparam), self.plot())
       writer.flush()
       writer.close()
@@ -248,7 +238,9 @@ class Solver(object):
       X, Y = data
       X, Y = X.to(**self.to_float_cuda), Y.cuda()
 
-      scores = self.model(X)
+      with amp.autocast():
+        scores = self.model(X)
+
       Ypred.append(torch.argmax(scores,dim=1))
       Yall.append(Y)
     
@@ -268,16 +260,12 @@ class Solver(object):
       'scaler_state_dict':self.scaler.state_dict(),
       'epoch':epoch,
       'stats':self.stats,
-      'config':self.config,
-      'hparam':self.hparam
+      'config':self.config
     }
     val_acc = self.stats['val_acc'][-1]
     PATH = f'runs/{self.model_start_time}/{self.model_start_time}_epoch_{epoch}_val_{val_acc:.4f}.tar'
 
     torch.save(checkpoint, PATH)
-
-    if self.verbose:
-      print(f'Saving checkpoint to "{PATH}"')
 
   @staticmethod
   def load_check_point(PATH, model, train_loader, val_loader, optimizer, lr, lr_scheduler= None):
@@ -294,11 +282,13 @@ class Solver(object):
       p['lr'] = lr
 
     solver = Solver(model, train_loader, val_loader, optimizer, lr_scheduler, previous_epoch = checkpoint['epoch'])
+    solver.scaler.load_state_dict(checkpoint['scaler_state_dict'])
     solver.stats = checkpoint['stats']
     solver.config = checkpoint['config']
+    
 
-    previous_epoch, check_every_epoch, print_every_iter = checkpoint['epoch'], solver.config['check_every_epoch'], solver.config['print_every_iter']
-    print(f'load successfully!! previous epoch: {previous_epoch}, check_every_epoch: {check_every_epoch}, print_every_iter: {print_every_iter}')
+    previous_epoch, check_every_epoch = checkpoint['epoch'], solver.config['check_every_epoch']
+    print(f'load successfully!! previous epoch: {previous_epoch}, check_every_epoch: {check_every_epoch}')
     return solver
 
     
@@ -333,8 +323,8 @@ class Solver(object):
 
 
 class ClassifierSolver(Solver):
-  def __init__(self, model, train_loader, val_loader, optimizer, lr_scheduler= None, print_every_iter=200, check_every_epoch=2, random_seed=0, previous_epoch = 0):
-    super().__init__(model, train_loader, val_loader, optimizer, lr_scheduler, print_every_iter, check_every_epoch, random_seed, previous_epoch)
+  def __init__(self, model, train_loader, val_loader, optimizer, lr_scheduler= None,  check_every_epoch=2, random_seed=0, previous_epoch = 0):
+    super().__init__(model, train_loader, val_loader, optimizer, lr_scheduler, check_every_epoch, random_seed, previous_epoch)
 
   def train_fn(self, Xtr, Ytr):
 
@@ -352,19 +342,24 @@ class ClassifierSolver(Solver):
 
   @staticmethod
   def load_check_point(PATH, model, train_loader, val_loader, optimizer, lr, lr_scheduler= None):
+    '''
+    Template function for future sub-class.
+    '''
     checkpoint = torch.load(PATH)
 
     model.load_state_dict(checkpoint['model_state_dict'])
     optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-
+    
     #overide the learning rate in old optimizer
     for p in optimizer.param_groups:
       p['lr'] = lr
 
     solver = ClassifierSolver(model, train_loader, val_loader, optimizer, lr_scheduler, previous_epoch = checkpoint['epoch'])
+    solver.scaler.load_state_dict(checkpoint['scaler_state_dict'])
     solver.stats = checkpoint['stats']
     solver.config = checkpoint['config']
+    
 
-    previous_epoch, check_every_epoch, print_every_iter = checkpoint['epoch'], solver.config['check_every_epoch'], solver.config['print_every_iter']
-    print(f'load successfully!! previous epoch: {previous_epoch}, check_every_epoch: {check_every_epoch}, print_every_iter: {print_every_iter}')
+    previous_epoch, check_every_epoch = checkpoint['epoch'], solver.config['check_every_epoch']
+    print(f'load successfully!! previous epoch: {previous_epoch}, check_every_epoch: {check_every_epoch}')
     return solver
