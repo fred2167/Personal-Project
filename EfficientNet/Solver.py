@@ -3,9 +3,8 @@ from torch.cuda import amp
 from torch.utils.tensorboard import SummaryWriter
 import matplotlib.pyplot as plt
 import random
-import pickle
 import time
-import math
+import numpy as np
 from tqdm import tqdm, trange
 
 
@@ -16,6 +15,7 @@ def fixrandomseed(seed=0):
   '''
   torch.manual_seed(seed)
   torch.cuda.manual_seed(seed)
+  np.random.seed(seed)
   # random.seed(seed)
 
 def Sampler(model_fn, model_args, train_loader, val_loader, num_model, epoch, lr_lowbound=-5, lr_highbound=0):
@@ -46,7 +46,7 @@ class Solver(object):
     Using NVDIA GPU, Cuda, Cudnn
   '''
 
-  def __init__(self, model, train_loader, val_loader, optimizer, lr_scheduler= None, check_every_epoch=2, random_seed=0, previous_epoch = 0):
+  def __init__(self, model, train_loader, val_loader, optimizer, lr_scheduler= None, check_every_epoch=2, random_seed=0):
     '''
     Inputs:
       - optimizer:          Standard Pytorch optimizer. Will ignore preset learning rate of the optimizer and set new learning rate at *train*
@@ -63,16 +63,19 @@ class Solver(object):
     self.lr_scheduler = lr_scheduler
     self.scaler = amp.GradScaler()
 
-    self.previous_epoch = previous_epoch
 
     # Book keeping variables
-    self.config = {}
-    self.config['check_every_epoch'] = check_every_epoch
+    self.config = dict(check_every_epoch=check_every_epoch, 
+                       model_start_time = time.ctime(),
+                       previous_epoch = 0)
 
-    self.stats = {}
-    stats_names = ['iter_loss', 'avg_loss', 'train_acc', 'val_acc','ratio']
-    for name in stats_names:
-      self.stats[name] = []
+
+    self.stats = dict(iter_loss = [],
+                      avg_loss = [],
+                      train_acc = [],
+                      val_acc = [],
+                      ratio = [])
+
 
     torch.cuda.synchronize()
     torch.backends.cudnn.benchmark = True
@@ -97,18 +100,24 @@ class Solver(object):
                             Save average epoch loss, train and validation accuracy to tensorboard.
                             After half of the training epoch, save model, optimizer ,and scalar state dict, current epoch, stats and config during checkpoint 
     '''
-    epoch += self.previous_epoch # for load previous model
-    self.model_start_time = time.ctime()
+
+  
+    model_start_time = self.config['model_start_time']
+    previous_epoch = self.config['previous_epoch']
+    check_every_epoch = self.config['check_every_epoch']
+
     self.config['hparam'] = hparam
 
+    epoch += previous_epoch # for load previous model
+
     if hparam:
-      writer = SummaryWriter('runs/'+self.model_start_time)
+      writer = SummaryWriter('runs/'+model_start_time)
 
     
     checkpoint_cycle_flag = True
     num_batch = len(self.train_loader)
     self.model.train()
-    for i in range(self.previous_epoch+1, epoch+1):
+    for i in range(previous_epoch+1, epoch+1):
 
       total_loss = 0
       iter_loss_history = []
@@ -119,7 +128,7 @@ class Solver(object):
         checkpoint_cycle_flag = False
         checkpoint_start_time = time.time()
 
-      for j, data in zip(s:= trange(num_batch, leave=False),self.train_loader):
+      for j, data in zip(s:=trange(num_batch, leave=False),self.train_loader):
         
 
         Xtr, Ytr = data
@@ -150,7 +159,7 @@ class Solver(object):
         
 
       # Enter checkpoint block after first and last epoch and specify checkpoint interval
-      if i % self.config['check_every_epoch'] == 0 or i == epoch:
+      if i % check_every_epoch == 0 or i == epoch:
         checkpoint_cycle_flag = True
         cur_lr = self.optimizer.param_groups[0]['lr']
 
@@ -160,12 +169,12 @@ class Solver(object):
         train_accuracy = (Y_pred_all == Y_tr_all).float().mean()
 
         # check val accuracy
-        val_accuracy = self._check_accuracy(self.val_loader)
+        val_accuracy, val_loss = self._check_accuracy(self.val_loader)
  
         # check update ratio
         ratio = self._check_update_ratio(cur_lr)
         
-        print(f'Epoch: {i}/{epoch}, Loss: {avg_loss:.4f} train acc: {train_accuracy:.4f}, val acc: {val_accuracy:.4f}, lr: {cur_lr:.4e}, update ratio: {ratio:.2e}, took {(time.time()-checkpoint_start_time):.2f} seconds')
+        print(f'Epoch: {i}/{epoch}, train loss: {avg_loss:.4f}, val loss: {val_loss:.4f}, train acc: {train_accuracy:.4f}, val acc: {val_accuracy:.4f},lr: {cur_lr:.4e}, update ratio: {ratio:.2e}, took {(time.time()-checkpoint_start_time):.2f} seconds')
 
         # Checkpoint Book keeping
         self.stats['train_acc'].append(train_accuracy)
@@ -191,7 +200,7 @@ class Solver(object):
     if hparam:
       metrics = {'Val Accuracy':self.stats['val_acc'][-1], 'Loss':self.stats['avg_loss'][-1]}
       writer.add_hparams(hparam, metrics, run_name='hparam')
-      writer.add_figure(str(hparam), self.plot())
+      writer.add_figure(self.config['model_start_time']+str(hparam), self.plot())
       writer.flush()
       writer.close()
       
@@ -202,15 +211,17 @@ class Solver(object):
     '''
     Check the ratio between weights and its graidents.
     Ideal ratio is around 1e-3
+
+    param.grad is the *raw* gradient
     '''
     param_norms = 0
-    update_norms = 0
+    grad_norms = 0
     for param in self.model.parameters():
         param_norms += torch.linalg.norm(param)
-        update_norms += torch.linalg.norm(param.grad)
-        break # only check the first layer weights??
+        grad_norms += torch.linalg.norm(param.grad)
+        # break # only check the first layer weights??
 
-    return (lr * update_norms / param_norms).item()
+    return (lr * grad_norms / param_norms).item()
 
   @torch.no_grad()
   def _check_accuracy(self, data_loader, num_sample=None):
@@ -237,13 +248,16 @@ class Solver(object):
 
     Ypred = []
     Yall = []
+    total_loss = 0
     for data in sub_data_loader:
       X, Y = data
       X, Y = X.to(**self.to_float_cuda), Y.cuda()
 
       with amp.autocast():
         scores = self.model(X)
+        loss = torch.nn.CrossEntropyLoss()(scores, Y)
 
+      total_loss += loss
       Ypred.append(torch.argmax(scores,dim=1))
       Yall.append(Y)
     
@@ -252,26 +266,27 @@ class Solver(object):
     acc = (Ypred == Yall).float().mean()
 
     self.model.train()
-    return acc.item()
+    return acc.item(), (total_loss / len(sub_data_loader)).item()
 
  
   def _save_checkpoint(self, epoch):
+    self.config['previous_epoch'] = epoch
 
     checkpoint = {
       'model_state_dict': self.model.state_dict(),
       'optimizer_state_dict': self.optimizer.state_dict(),
       'scaler_state_dict':self.scaler.state_dict(),
-      'epoch':epoch,
       'stats':self.stats,
       'config':self.config
     }
     val_acc = self.stats['val_acc'][-1]
-    PATH = f'runs/{self.model_start_time}/{self.model_start_time}_epoch_{epoch}_val_{val_acc:.4f}.tar'
+    model_start_time = self.config['model_start_time']
+    PATH = f'runs/{model_start_time}/{model_start_time}_epoch_{epoch}_val_{val_acc:.4f}.tar'
 
     torch.save(checkpoint, PATH)
 
   @staticmethod
-  def load_check_point(INSTANCE, PATH, model, train_loader, val_loader, optimizer, lr, lr_scheduler= None):
+  def _load_check_point(INSTANCE, PATH, model, train_loader, val_loader, optimizer, lr, lr_scheduler= None):
     '''
     Sub-class should overload this method with INSTANCE
     '''
@@ -284,14 +299,14 @@ class Solver(object):
     for p in optimizer.param_groups:
       p['lr'] = lr
 
-    solver = INSTANCE(model, train_loader, val_loader, optimizer, lr_scheduler, previous_epoch = checkpoint['epoch'])
+    solver = INSTANCE(model, train_loader, val_loader, optimizer, lr_scheduler)
     solver.scaler.load_state_dict(checkpoint['scaler_state_dict'])
     solver.stats = checkpoint['stats']
     solver.config = checkpoint['config']
     
 
-    previous_epoch, check_every_epoch = checkpoint['epoch'], solver.config['check_every_epoch']
-    print(f'load successfully!! previous epoch: {previous_epoch}, check_every_epoch: {check_every_epoch}')
+    config = checkpoint['config']
+    print(f'load successfully!! {str(config)}')
     return solver
 
     
@@ -326,8 +341,8 @@ class Solver(object):
 
 
 class ClassifierSolver(Solver):
-  def __init__(self, model, train_loader, val_loader, optimizer, lr_scheduler= None,  check_every_epoch=2, random_seed=0, previous_epoch = 0):
-    super().__init__(model, train_loader, val_loader, optimizer, lr_scheduler, check_every_epoch, random_seed, previous_epoch)
+  def __init__(self, model, train_loader, val_loader, optimizer, lr_scheduler= None,  check_every_epoch=2, random_seed=0):
+    super().__init__(model, train_loader, val_loader, optimizer, lr_scheduler, check_every_epoch, random_seed)
 
   def train_fn(self, Xtr, Ytr):
 
@@ -345,4 +360,4 @@ class ClassifierSolver(Solver):
 
   @staticmethod
   def load_check_point(PATH, model, train_loader, val_loader, optimizer, lr, lr_scheduler= None):
-    return Solver.load_check_point(ClassifierSolver, PATH, model, train_loader, val_loader, optimizer, lr, lr_scheduler)
+    return Solver._load_check_point(ClassifierSolver, PATH, model, train_loader, val_loader, optimizer, lr, lr_scheduler)
