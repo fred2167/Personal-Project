@@ -132,7 +132,7 @@ class Solver(object):
         
 
         Xtr, Ytr = data
-        Xtr, Ytr = Xtr.to(**self.to_float_cuda), Ytr.cuda()
+        Xtr, Ytr = Xtr.to(**self.to_float_cuda,non_blocking=True), Ytr.cuda(non_blocking=True)
 
         ################################## Future changes ##########################################################
 
@@ -219,7 +219,7 @@ class Solver(object):
     for param in self.model.parameters():
         param_norms += torch.linalg.norm(param)
         grad_norms += torch.linalg.norm(param.grad)
-        # break # only check the first layer weights??
+        break # only check the first layer weights??
 
     return (lr * grad_norms / param_norms).item()
 

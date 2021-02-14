@@ -15,6 +15,29 @@ def round_filters(filters, width_coefficient, depth_divisor= 8):
         new_filters += depth_divisor
     return int(new_filters)
 
+class self_attention(nn.Module):
+  
+  def __init__(self, in_channel, intermediate_channel):
+    super().__init__()
+
+    self.query = nn.Conv2d(in_channel, intermediate_channel, 1)
+    self.key = nn.Conv2d(in_channel, intermediate_channel, 1)
+    self.value = nn.Conv2d(in_channel, intermediate_channel, 1)
+    self.channel_adjust = nn.Conv2d(intermediate_channel, in_channel, 1)
+
+  def forward(self, x):
+
+    queries = self.query(x)
+    keys = self.key(x)
+    values = self.value(x)
+    B, C, H, W= queries.shape
+
+    attention = F.softmax(queries.view(B,C,-1).permute(0,2,1).bmm(keys.view(B,C,-1)), dim=2) # (B,HW,HW)
+    out = values.view(B,C,-1).bmm(attention) # (B,C,HW)->(B,C,H,W)
+    out = self.channel_adjust(out.view(B,C,H,W))
+
+    return out + x
+
 
 class efficientNet (nn.Module):
   '''
@@ -112,11 +135,13 @@ class efficientNet (nn.Module):
     stage_9 = nn. Sequential( nn.Conv2d(stage_8_param["output_channels"], stage_9_param["output_channels"], stage_9_param["kernel_size"], bias= False),
                               nn.BatchNorm2d(stage_9_param["output_channels"],momentum=0.01),
                               nn.ReLU(),
+                              self_attention(stage_9_param["output_channels"], stage_8_param["output_channels"]),
                               nn.AdaptiveAvgPool2d((1,1)),
                               nn.Flatten(),
                               nn.Dropout(classifier_dropout[fi]),
                               nn.Linear(stage_9_param["output_channels"], num_classes))
-    
+
+
     self.model = nn.Sequential(stage_1,
                                stage_2,
                                stage_3,
