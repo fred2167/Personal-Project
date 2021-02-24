@@ -1,0 +1,74 @@
+Sun Jan 17 17:24:06 PST 2021
+Darwin silvery 17.7.0 Darwin Kernel Version 17.7.0: Fri Oct 30 13:34:27 PDT 2020; root:xnu-4570.71.82.8~1/RELEASE_X86_64 x86_64
+uid=501(yusuf) gid=20(staff) groups=20(staff),12(everyone),61(localaccounts),79(_appserverusr),80(admin),81(_appserveradm),98(_lpadmin),33(_appstore),100(_lpoperator),204(_developer),250(_analyticsusers),395(com.apple.access_ftp),398(com.apple.access_screensharing),399(com.apple.access_ssh),701(com.apple.sharepoint.group.1),702(com.apple.sharepoint.group.2)
+=====================================================
+1. Compiles without warnings with -Wall -Wextra flags
+=====================================================
+=====================================================
+2. Runs and produces correct output
+=====================================================
+Starting test01
+* Testing ==, !=, [] and copy constructor
+Ending tes01
+Starting test02
+* Testing traversal
+Ending test02
+Starting test03
+* Testing rebalance
+Ending test03
+Starting AC test01
+* Testing basic autocomplete
+Ending tesAC01
+Starting AC test02
+* Testing cities autocomplete
+Ending tesAC02
+=====================================================
+3. clang-tidy warnings are fixed
+=====================================================
+=====================================================
+4. clang-format does not find any formatting issues
+=====================================================
+Running clang-format on ./autocomplete.cpp
+Running clang-format on ./bstmap.cpp
+Running clang-format on ./main.cpp
+Running clang-format on ./testac.cpp
+Running clang-format on ./testbst.cpp
+=====================================================
+5. No memory leaks using g++
+=====================================================
+=====================================================
+6. No memory leaks using valgrind, look for "definitely lost" 
+=====================================================
+==8947== Memcheck, a memory error detector
+==8947== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==8947== Using Valgrind-3.16.1 and LibVEX; rerun with -h for copyright info
+==8947== Command: ./a.out --test
+==8947== Parent PID: 8719
+==8947== 
+==8947== 
+==8947== HEAP SUMMARY:
+==8947==     in use at exit: 84,015 bytes in 167 blocks
+==8947==   total heap usage: 163,964 allocs, 163,797 frees, 9,466,679 bytes allocated
+==8947== 
+==8947== LEAK SUMMARY:
+==8947==    definitely lost: 0 bytes in 0 blocks
+==8947==    indirectly lost: 0 bytes in 0 blocks
+==8947==      possibly lost: 72 bytes in 3 blocks
+==8947==    still reachable: 65,736 bytes in 7 blocks
+==8947==         suppressed: 18,207 bytes in 157 blocks
+==8947== Rerun with --leak-check=full to see details of leaked memory
+==8947== 
+==8947== For lists of detected and suppressed errors, rerun with: -s
+==8947== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 1 from 1)
+=====================================================
+7. Tests have full code coverage
+=====================================================
+warning: default.profraw: Unsupported instrumentation profile format version
+error: No profiles could be merged.
+ERROR: ./check-code-coverage.sh: Failed to create a.out.profdata
+Sun Jan 17 17:25:32 PST 2021
+=====================================================
+To create an output.txt file with all the output from this script
+Run the below command
+      ./create-output.sh > output.txt 2>&1 
+=====================================================

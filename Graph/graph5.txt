@@ -1,0 +1,22 @@
+19
+A B 4
+A E 15
+A G 6
+B C 10
+B E 12
+C E 5
+C F 9
+C D 7
+D F 3
+D Z 14
+E F 2
+E G 9
+E H 4
+F H 8
+F I 15
+F Z 16
+G H 13
+H I 6
+I Z 3
+
+Graph for dijkstra algo from lecture slide
