@@ -1,0 +1,644 @@
+Fri Mar 12 15:45:45 PST 2021
+Linux csslab7.uwb.edu 3.10.0-1160.11.1.el7.x86_64 #1 SMP Fri Dec 18 16:34:56 UTC 2020 x86_64 x86_64 x86_64 GNU/Linux
+uid=1116106(fred2167) gid=2121116106(fred2167) groups=2121116106(fred2167),605559(lab-access)
+=====================================================
+1. Compiles without warnings with -Wall -Wextra flags
+=====================================================
+=====================================================
+2. Runs and produces correct output
+=====================================================
+Start testStore1
+End testStore1
+Start testStore2
+End testStore2
+=====================================
+Start testStoreFinal
+End testStoreFinal
+=====================================
+Don't know how to create Z as an Inventory.
+Don't know how to create Z as an Inventory.
+Don't know how to create Z as an Inventory.
+Don't know how to create 2 as a Transaction.
+Don't know how to create X as a Transaction.
+Don't know how to create Z as a Transaction.
+Don't know how to create V as an Inventory.
+Don't know how to create 3 as a Transaction.
+3333, Witch Wicked
+8888, Pig Porky
+4444, Moose Bullwinkle
+9999, Duck Daffy
+6666, Donkey Darrell
+7777, Spider Sammy
+1111, Mouse Mickey
+1000, Mouse Minnie
+9000, Lizard Larry
+8000, Wacky Wally
+5000, Frog Freddie
+2000, Duck Donald
+Don't know how to create Z as an Inventory.
+Don't know how to create Z as an Inventory.
+Don't know how to create Z as an Inventory.
+Don't know how to create 2 as a Transaction.
+Don't know how to create X as a Transaction.
+Don't know how to create Z as a Transaction.
+Don't know how to create V as an Inventory.
+Don't know how to create 3 as a Transaction.
+*DisplayInventory*
+Comedy: Annie Hall, Woody Allen, 1977, DVD 10(0), 
+Comedy: Fargo, Joel Coen, 1996, DVD 10(0), 
+Comedy: National Lampoon's Animal House, John Landis, 1978, DVD 10(0), 
+Comedy: Pirates of the Caribbean, Different Years, 2000, DVD 10(0), 
+Comedy: Pirates of the Caribbean, Gore Verbinski, 2003, DVD 10(0), 
+Comedy: Sleepless in Seattle, Nora Ephron, 1993, DVD 10(0), 
+Comedy: When Harry Met Sally, Rob Reiner, 1989, DVD 10(0), 
+Comedy: You've Got Mail, Nora Ephron, 1998, DVD 10(0), 
+Drama: Good Morning Vietnam, Barry Levinson, 1988, DVD 10(0), 
+Drama: Same Director Good Morning Vietnam, Barry Levinson, 1988, DVD 10(0), 
+Drama: Unforgiven, Clint Eastwood, 1992, DVD 10(0), 
+Drama: Good Will Hunting, Gus Van Sant, 2000, DVD 10(0), 
+Drama: Silence of the Lambs, Jonathan Demme, 1991, DVD 10(0), 
+Drama: Dogfight, Nancy Savoca, 1991, DVD 10(0), 
+Drama: King of Hearts, Phillippe De Broca, 1967, DVD 10(0), 
+Drama: Schindler's List, Steven Spielberg, 1993, DVD 10(0), 
+Classics: Holiday, George Cukor, 9 1938, Cary Grant, DVD 10(0), 
+Classics: Holiday, George Cukor, 9 1938, Katherine Hepburn, DVD 10(0), 
+Classics: Gone With the Wind, Victor Fleming, 2 1939, Clark Gable, DVD 10(0), 
+Classics: Gone With the Wind, Victor Fleming, 2 1939, Vivien Leigh, DVD 10(0), 
+Classics: The Wizard of Oz, Victor Fleming, 7 1939, Judy Garland, DVD 10(0), 
+Classics: The Philadelphia Story, George Cukor, 5 1940, Cary Grant, DVD 10(0), 
+Classics: The Philadelphia Story, George Cukor, 5 1940, Katherine Hepburn, DVD 10(0), 
+Classics: The Maltese Falcon, John Huston, 10 1941, Humphrey Bogart, DVD 10(0), 
+Classics: Casablanca, Michael Curtiz, 8 1942, Humphrey Bogart, DVD 10(0), 
+Classics: Casablanca, Michael Curtiz, 8 1942, Ingrid Bergman, DVD 10(0), 
+Classics: It's a Wonderful Life, Frank Capra, 11 1946, Donna Reed, DVD 10(0), 
+Classics: It's a Wonderful Life, Frank Capra, 11 1946, James Steward, DVD 10(0), 
+Classics: A Clockwork Orange, Stanley Kubrick, 2 1971, Malcolm McDowell, DVD 10(0), 
+Classics: Harold and Maude, Hal Ashby, 3 1971, Ruth Gordon, DVD 10(0), 
+*History* Customer: 1000
+*History* Customer: 5000
+*History* Customer: 8000
+**Invalid CustomerID** 1234
+**Not in Inventory** *Borrow* 1000, Bogus Title, 2001
+**Invalid MediaType** Z for Comedy: Fargo, Joel Coen, 1996, DVD 9(1), 
+**Out of Stock** Classics: Harold and Maude, Hal Ashby, 3 1971, Ruth Gordon, DVD 0(10), 
+**Out of Stock** Classics: Harold and Maude, Hal Ashby, 3 1971, Ruth Gordon, DVD 0(10), 
+**Out of Stock** Classics: Harold and Maude, Hal Ashby, 3 1971, Ruth Gordon, DVD 0(10), 
+**Not in Inventory** *Borrow* 1000, Steven Spielberg, Bogus Title
+*DisplayInventory*
+Comedy: Annie Hall, Woody Allen, 1977, DVD 9(1), 
+Comedy: Fargo, Joel Coen, 1996, DVD 9(1), 
+Comedy: National Lampoon's Animal House, John Landis, 1978, DVD 9(1), 
+Comedy: Pirates of the Caribbean, Different Years, 2000, DVD 10(0), 
+Comedy: Pirates of the Caribbean, Gore Verbinski, 2003, DVD 10(0), 
+Comedy: Sleepless in Seattle, Nora Ephron, 1993, DVD 9(1), 
+Comedy: When Harry Met Sally, Rob Reiner, 1989, DVD 9(1), 
+Comedy: You've Got Mail, Nora Ephron, 1998, DVD 9(1), 
+Drama: Good Morning Vietnam, Barry Levinson, 1988, DVD 9(1), 
+Drama: Same Director Good Morning Vietnam, Barry Levinson, 1988, DVD 10(0), 
+Drama: Unforgiven, Clint Eastwood, 1992, DVD 9(1), 
+Drama: Good Will Hunting, Gus Van Sant, 2000, DVD 9(1), 
+Drama: Silence of the Lambs, Jonathan Demme, 1991, DVD 9(1), 
+Drama: Dogfight, Nancy Savoca, 1991, DVD 8(2), 
+Drama: King of Hearts, Phillippe De Broca, 1967, DVD 9(1), 
+Drama: Schindler's List, Steven Spielberg, 1993, DVD 9(1), 
+Classics: Holiday, George Cukor, 9 1938, Cary Grant, DVD 9(1), 
+Classics: Holiday, George Cukor, 9 1938, Katherine Hepburn, DVD 10(0), 
+Classics: Gone With the Wind, Victor Fleming, 2 1939, Clark Gable, DVD 10(0), 
+Classics: Gone With the Wind, Victor Fleming, 2 1939, Vivien Leigh, DVD 10(0), 
+Classics: The Wizard of Oz, Victor Fleming, 7 1939, Judy Garland, DVD 10(0), 
+Classics: The Philadelphia Story, George Cukor, 5 1940, Cary Grant, DVD 9(1), 
+Classics: The Philadelphia Story, George Cukor, 5 1940, Katherine Hepburn, DVD 9(1), 
+Classics: The Maltese Falcon, John Huston, 10 1941, Humphrey Bogart, DVD 9(1), 
+Classics: Casablanca, Michael Curtiz, 8 1942, Humphrey Bogart, DVD 10(0), 
+Classics: Casablanca, Michael Curtiz, 8 1942, Ingrid Bergman, DVD 10(0), 
+Classics: It's a Wonderful Life, Frank Capra, 11 1946, Donna Reed, DVD 10(0), 
+Classics: It's a Wonderful Life, Frank Capra, 11 1946, James Steward, DVD 10(0), 
+Classics: A Clockwork Orange, Stanley Kubrick, 2 1971, Malcolm McDowell, DVD 9(1), 
+Classics: Harold and Maude, Hal Ashby, 3 1971, Ruth Gordon, DVD 0(10), 
+*History* Customer: 1000
+*Borrow* 1000, Ruth Gordon, 3 1971
+*Borrow* 1000, Cary Grant, 5 1940
+*Borrow* 1000, Gus Van Sant, Good Will Hunting
+*Borrow* 1000, Katherine Hepburn, 5 1940
+*Borrow* 1000, Barry Levinson, Good Morning Vietnam
+*History* Customer: 1111
+*Borrow* 1111, Cary Grant, 9 1938
+*Borrow* 1111, Humphrey Bogart, 10 1941
+*Borrow* 1111, Ruth Gordon, 3 1971
+*Borrow* 1111, Malcolm McDowell, 2 1971
+*History* Customer: 5000
+*Borrow* 5000, Ruth Gordon, 3 1971
+*Return* 5000, Ruth Gordon, 3 1971
+*Borrow* 5000, Ruth Gordon, 3 1971
+*Return* 5000, Ruth Gordon, 3 1971
+*Borrow* 5000, Ruth Gordon, 3 1971
+*Return* 5000, Ruth Gordon, 3 1971
+*Borrow* 5000, Ruth Gordon, 3 1971
+*History* Customer: 8000
+*Borrow* 8000, National Lampoon's Animal House, 1978
+*Borrow* 8000, Ruth Gordon, 3 1971
+*Borrow* 8000, Ruth Gordon, 3 1971
+*Return* 8000, You've Got Mail, 1998
+*Borrow* 8000, You've Got Mail, 1998
+**Customer 8888 NOT borrow** Ruth Gordon, 3 1971
+**Customer 8888 NOT borrow** Ruth Gordon, 3 1971
+*History* Customer: 8888
+*Return* 8888, Ruth Gordon, 3 1971
+*Borrow* 8888, Ruth Gordon, 3 1971
+*Borrow* 8888, Nancy Savoca, Dogfight
+*Borrow* 8888, Jonathan Demme, Silence of the Lambs
+*Borrow* 8888, When Harry Met Sally, 1989
+*Borrow* 8888, Annie Hall, 1977
+**Invalid CustomerID** 5858
+Done.
+=====================================================
+3. clang-tidy warnings are fixed
+=====================================================
+16845 warnings generated.
+33627 warnings generated.
+50408 warnings generated.
+67369 warnings generated.
+84030 warnings generated.
+100811 warnings generated.
+113139 warnings generated.
+127567 warnings generated.
+144292 warnings generated.
+162281 warnings generated.
+173031 warnings generated.
+185773 warnings generated.
+202417 warnings generated.
+219366 warnings generated.
+232088 warnings generated.
+248934 warnings generated.
+265872 warnings generated.
+279874 warnings generated.
+296922 warnings generated.
+307657 warnings generated.
+/home/NETID/fred2167/343/2021wi343b-movie-fred2167/Borrow.cpp:12:15: error: initialization of 'borrowFactory' with static storage duration may throw an exception that cannot be caught [cert-err58-cpp,-warnings-as-errors]
+BorrowFactory borrowFactory;
+              ^
+/home/NETID/fred2167/343/2021wi343b-movie-fred2167/Borrow.cpp:3:16: note: possibly throwing constructor declared here
+BorrowFactory::BorrowFactory() {
+               ^
+/home/NETID/fred2167/343/2021wi343b-movie-fred2167/Classics.cpp:13:17: error: initialization of 'classicsFactory' with static storage duration may throw an exception that cannot be caught [cert-err58-cpp,-warnings-as-errors]
+ClassicsFactory classicsFactory;
+                ^
+/home/NETID/fred2167/343/2021wi343b-movie-fred2167/Classics.cpp:3:18: note: possibly throwing constructor declared here
+ClassicsFactory::ClassicsFactory() {
+                 ^
+/home/NETID/fred2167/343/2021wi343b-movie-fred2167/Comedy.cpp:12:15: error: initialization of 'comFactory' with static storage duration may throw an exception that cannot be caught [cert-err58-cpp,-warnings-as-errors]
+ComedyFactory comFactory;
+              ^
+/home/NETID/fred2167/343/2021wi343b-movie-fred2167/Comedy.cpp:3:16: note: possibly throwing constructor declared here
+ComedyFactory::ComedyFactory() {
+               ^
+/home/NETID/fred2167/343/2021wi343b-movie-fred2167/Customer.cpp:13:17: error: initialization of 'customerFactory' with static storage duration may throw an exception that cannot be caught [cert-err58-cpp,-warnings-as-errors]
+CustomerFactory customerFactory;
+                ^
+/home/NETID/fred2167/343/2021wi343b-movie-fred2167/Customer.cpp:3:18: note: possibly throwing constructor declared here
+CustomerFactory::CustomerFactory() {
+                 ^
+/home/NETID/fred2167/343/2021wi343b-movie-fred2167/DisplayInventory.cpp:14:25: error: initialization of 'displayInventoryFactory' with static storage duration may throw an exception that cannot be caught [cert-err58-cpp,-warnings-as-errors]
+DisplayInventoryFactory displayInventoryFactory;
+                        ^
+/home/NETID/fred2167/343/2021wi343b-movie-fred2167/DisplayInventory.cpp:3:26: note: possibly throwing constructor declared here
+DisplayInventoryFactory::DisplayInventoryFactory() {
+                         ^
+/home/NETID/fred2167/343/2021wi343b-movie-fred2167/Drama.cpp:13:14: error: initialization of 'dramaFactory' with static storage duration may throw an exception that cannot be caught [cert-err58-cpp,-warnings-as-errors]
+DramaFactory dramaFactory;
+             ^
+/home/NETID/fred2167/343/2021wi343b-movie-fred2167/Drama.cpp:3:15: note: possibly throwing constructor declared here
+DramaFactory::DramaFactory() {
+              ^
+/home/NETID/fred2167/343/2021wi343b-movie-fred2167/DVD.cpp:9:12: error: initialization of 'dvdFactory' with static storage duration may throw an exception that cannot be caught [cert-err58-cpp,-warnings-as-errors]
+DVDFactory dvdFactory;
+           ^
+/home/NETID/fred2167/343/2021wi343b-movie-fred2167/DVD.cpp:3:13: note: possibly throwing constructor declared here
+DVDFactory::DVDFactory() { MediaType::registerMediaTypeFactory("D", this); }
+            ^
+/home/NETID/fred2167/343/2021wi343b-movie-fred2167/History.cpp:12:16: error: initialization of 'historyFactory' with static storage duration may throw an exception that cannot be caught [cert-err58-cpp,-warnings-as-errors]
+HistoryFactory historyFactory;
+               ^
+/home/NETID/fred2167/343/2021wi343b-movie-fred2167/History.cpp:3:17: note: possibly throwing constructor declared here
+HistoryFactory::HistoryFactory() {
+                ^
+/home/NETID/fred2167/343/2021wi343b-movie-fred2167/Return.cpp:12:15: error: initialization of 'returnFactory' with static storage duration may throw an exception that cannot be caught [cert-err58-cpp,-warnings-as-errors]
+ReturnFactory returnFactory;
+              ^
+/home/NETID/fred2167/343/2021wi343b-movie-fred2167/Return.cpp:3:16: note: possibly throwing constructor declared here
+ReturnFactory::ReturnFactory() {
+               ^
+Suppressed 307648 warnings (307648 in non-user code).
+Use -header-filter=.* to display errors from all non-system headers. Use -system-headers to display errors from system headers as well.
+9 warnings treated as errors
+=====================================================
+4. clang-format does not find any formatting issues
+=====================================================
+Running clang-format on ./Borrow.cpp
+Running clang-format on ./Classics.cpp
+Running clang-format on ./Comedy.cpp
+Running clang-format on ./Customer.cpp
+Running clang-format on ./DisplayInventory.cpp
+Running clang-format on ./Drama.cpp
+Running clang-format on ./DVD.cpp
+Running clang-format on ./Hash.cpp
+Running clang-format on ./History.cpp
+Running clang-format on ./Inventory.cpp
+Running clang-format on ./main.cpp
+Running clang-format on ./MediaType.cpp
+Running clang-format on ./Movie.cpp
+Running clang-format on ./my_test.cpp
+Running clang-format on ./Person.cpp
+Running clang-format on ./Return.cpp
+Running clang-format on ./Store.cpp
+Running clang-format on ./store_test.cpp
+Running clang-format on ./Transaction.cpp
+Running clang-format on ./util.cpp
+=====================================================
+5. No memory leaks using g++
+=====================================================
+=====================================================
+6. No memory leaks using valgrind, look for "definitely lost" 
+=====================================================
+==2772== Memcheck, a memory error detector
+==2772== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==2772== Using Valgrind-3.15.0 and LibVEX; rerun with -h for copyright info
+==2772== Command: ./a.out
+==2772== Parent PID: 1455
+==2772== 
+==2772== 
+==2772== HEAP SUMMARY:
+==2772==     in use at exit: 0 bytes in 0 blocks
+==2772==   total heap usage: 789 allocs, 789 frees, 195,722 bytes allocated
+==2772== 
+==2772== All heap blocks were freed -- no leaks are possible
+==2772== 
+==2772== For lists of detected and suppressed errors, rerun with: -s
+==2772== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+=====================================================
+7. Tests have full code coverage
+=====================================================
+File '/home/NETID/fred2167/343/2021wi343b-movie-fred2167/Borrow.cpp':
+Name                                   Regions    Miss   Cover     Lines    Miss   Cover
+----------------------------------------------------------------------------------------
+BorrowFactory::BorrowFactory()               1       0 100.00%         3       0 100.00%
+BorrowFactory::create() const                1       0 100.00%         1       0 100.00%
+Borrow::read(std::istream&)                  3       0 100.00%        12       0 100.00%
+Borrow::printer(std::ostream&) const         4       1  75.00%         8       2  75.00%
+Borrow::~Borrow()                            1       0 100.00%         4       0 100.00%
+Borrow::process(Store&)                     16       0 100.00%        48       0 100.00%
+----------------------------------------------------------------------------------------
+TOTAL                                       26       1  96.15%        76       2  97.37%
+
+File '/home/NETID/fred2167/343/2021wi343b-movie-fred2167/Classics.cpp':
+Name                                                Regions    Miss   Cover     Lines    Miss   Cover
+-----------------------------------------------------------------------------------------------------
+ClassicsFactory::ClassicsFactory()                        1       0 100.00%         4       0 100.00%
+ClassicsFactory::create()                                 1       0 100.00%         1       0 100.00%
+Classics::Classics()                                      1       0 100.00%         1       0 100.00%
+Classics::operator<(Inventory&)                           7       0 100.00%        10       0 100.00%
+Classics::operator>(Inventory&)                           7       7   0.00%        10      10   0.00%
+Classics::operator==(Inventory&)                          5       0 100.00%         6       0 100.00%
+Classics::read(std::istream&)                             1       0 100.00%        12       0 100.00%
+Classics::transactionRead(std::istream&)                  1       0 100.00%         8       0 100.00%
+Classics::printer(std::ostream&) const                    2       0 100.00%         8       0 100.00%
+Classics::transactionPrinter(std::ostream&) const         1       0 100.00%         4       0 100.00%
+-----------------------------------------------------------------------------------------------------
+TOTAL                                                    27       7  74.07%        64      10  84.38%
+
+File '/home/NETID/fred2167/343/2021wi343b-movie-fred2167/Comedy.cpp':
+Name                                                Regions    Miss   Cover     Lines    Miss   Cover
+-----------------------------------------------------------------------------------------------------
+ComedyFactory::ComedyFactory()                            1       0 100.00%         4       0 100.00%
+ComedyFactory::create()                                   1       0 100.00%         1       0 100.00%
+Comedy::Comedy()                                          1       0 100.00%         1       0 100.00%
+Comedy::operator<(Inventory&)                             4       0 100.00%         7       0 100.00%
+Comedy::operator>(Inventory&)                             4       4   0.00%         7       7   0.00%
+Comedy::operator==(Inventory&)                            3       0 100.00%         4       0 100.00%
+Comedy::read(std::istream&)                               1       0 100.00%         8       0 100.00%
+Comedy::transactionRead(std::istream&)                    1       0 100.00%         5       0 100.00%
+Comedy::printer(std::ostream&) const                      2       0 100.00%         7       0 100.00%
+Comedy::transactionPrinter(std::ostream&) const           1       0 100.00%         4       0 100.00%
+-----------------------------------------------------------------------------------------------------
+TOTAL                                                    19       4  78.95%        48       7  85.42%
+
+File '/home/NETID/fred2167/343/2021wi343b-movie-fred2167/Customer.cpp':
+Name                                                Regions    Miss   Cover     Lines    Miss   Cover
+-----------------------------------------------------------------------------------------------------
+CustomerFactory::CustomerFactory()                        1       0 100.00%         4       0 100.00%
+CustomerFactory::create()                                 1       0 100.00%         1       0 100.00%
+Customer::~Customer()                                     2       0 100.00%         6       0 100.00%
+Customer::displayCustomerHistory()                        4       0 100.00%         6       0 100.00%
+Customer::hasBorrow(Inventory*)                           7       0 100.00%         8       0 100.00%
+Customer::addToCustomerHistory(Transaction*)              1       0 100.00%         1       0 100.00%
+Customer::addToOnLoan(Inventory*)                         1       0 100.00%         1       0 100.00%
+Customer::removeFromOnLoan(Inventory*)                    8       0 100.00%         9       0 100.00%
+Customer::addToAlreadyReturn(Inventory*)                  1       0 100.00%         3       0 100.00%
+Customer::read(std::istream&)                             1       0 100.00%         5       0 100.00%
+Customer::printer(std::ostream&) const                    1       0 100.00%         4       0 100.00%
+-----------------------------------------------------------------------------------------------------
+TOTAL                                                    28       0 100.00%        48       0 100.00%
+
+File '/home/NETID/fred2167/343/2021wi343b-movie-fred2167/DisplayInventory.cpp':
+Name                                                 Regions    Miss   Cover     Lines    Miss   Cover
+------------------------------------------------------------------------------------------------------
+DisplayInventoryFactory::DisplayInventoryFactory()         1       0 100.00%         3       0 100.00%
+DisplayInventoryFactory::create() const                    1       0 100.00%         3       0 100.00%
+DisplayInventory::read(std::istream&)                      1       0 100.00%         4       0 100.00%
+DisplayInventory::printer(std::ostream&) const             4       1  75.00%         7       2  71.43%
+DisplayInventory::process(Store&)                          4       1  75.00%        10       2  80.00%
+------------------------------------------------------------------------------------------------------
+TOTAL                                                     11       2  81.82%        27       4  85.19%
+
+File '/home/NETID/fred2167/343/2021wi343b-movie-fred2167/Drama.cpp':
+Name                                                 Regions    Miss   Cover     Lines    Miss   Cover
+------------------------------------------------------------------------------------------------------
+DramaFactory::DramaFactory()                               1       0 100.00%         4       0 100.00%
+DramaFactory::create()                                     1       0 100.00%         1       0 100.00%
+Drama::Drama()                                             1       0 100.00%         1       0 100.00%
+Drama::operator<(Inventory&)                               4       0 100.00%         7       0 100.00%
+Drama::operator>(Inventory&)                               4       4   0.00%         7       7   0.00%
+Drama::operator==(Inventory&)                              3       3   0.00%         4       4   0.00%
+Drama::read(std::istream&)                                 1       0 100.00%         8       0 100.00%
+Drama::transactionRead(std::istream&)                      1       0 100.00%         7       0 100.00%
+Drama::printer(std::ostream&) const                        2       0 100.00%         7       0 100.00%
+Drama::transactionPrinter(std::ostream&) const             1       0 100.00%         4       0 100.00%
+------------------------------------------------------------------------------------------------------
+TOTAL                                                     19       7  63.16%        50      11  78.00%
+
+File '/home/NETID/fred2167/343/2021wi343b-movie-fred2167/DVD.cpp':
+Name                                                 Regions    Miss   Cover     Lines    Miss   Cover
+------------------------------------------------------------------------------------------------------
+DVDFactory::DVDFactory()                                   1       0 100.00%         1       0 100.00%
+DVDFactory::create() const                                 1       0 100.00%         1       0 100.00%
+DVD::read(std::istream&)                                   1       0 100.00%         4       0 100.00%
+DVD::printer(std::ostream&) const                          1       0 100.00%         4       0 100.00%
+------------------------------------------------------------------------------------------------------
+TOTAL                                                      4       0 100.00%        10       0 100.00%
+
+File '/home/NETID/fred2167/343/2021wi343b-movie-fred2167/Hash.cpp':
+Name                                                 Regions    Miss   Cover     Lines    Miss   Cover
+------------------------------------------------------------------------------------------------------
+Hash::Hash()                                               4       0 100.00%         8       0 100.00%
+Hash::~Hash()                                              5       0 100.00%         8       0 100.00%
+Hash::insert(int, Person*&)                                4       1  75.00%         7       2  71.43%
+Hash::retrieve(int)                                        5       1  80.00%         9       0 100.00%
+Hash::has(int)                                             5       0 100.00%         9       0 100.00%
+Hash::hashFn(int)                                          1       0 100.00%         1       0 100.00%
+------------------------------------------------------------------------------------------------------
+TOTAL                                                     24       2  91.67%        42       2  95.24%
+
+File '/home/NETID/fred2167/343/2021wi343b-movie-fred2167/History.cpp':
+Name                                                 Regions    Miss   Cover     Lines    Miss   Cover
+------------------------------------------------------------------------------------------------------
+HistoryFactory::HistoryFactory()                           1       0 100.00%         3       0 100.00%
+HistoryFactory::create() const                             1       0 100.00%         1       0 100.00%
+History::read(std::istream&)                               1       0 100.00%         6       0 100.00%
+History::printer(std::ostream&) const                      4       1  75.00%         7       2  71.43%
+History::process(Store&)                                   7       2  71.43%        20       6  70.00%
+------------------------------------------------------------------------------------------------------
+TOTAL                                                     14       3  78.57%        37       8  78.38%
+
+File '/home/NETID/fred2167/343/2021wi343b-movie-fred2167/Inventory.cpp':
+Name                                                                  Regions    Miss   Cover     Lines    Miss   Cover
+-----------------------------------------------------------------------------------------------------------------------
+operator<<(std::ostream&, Inventory const&)                                 1       0 100.00%         3       0 100.00%
+operator>>(std::istream&, Inventory&)                                       1       0 100.00%         1       0 100.00%
+Inventory::~Inventory()                                                     2       0 100.00%         6       0 100.00%
+Inventory::hasMedia(std::string&)                                           1       0 100.00%         1       0 100.00%
+Inventory::getMedia(std::string&)                                           4       1  75.00%         7       3  57.14%
+Inventory::getType()                                                        1       0 100.00%         1       0 100.00%
+Inventory::registerMediaType(std::string const&, MediaType*)                1       0 100.00%         3       0 100.00%
+Inventory::addToInventoryHistory(Transaction*)                              1       0 100.00%         3       0 100.00%
+Inventory::getInventoryFactories()                                          1       0 100.00%         6       0 100.00%
+Inventory::getInventoriesMap()                                              1       0 100.00%         7       0 100.00%
+Inventory::compare(Inventory*, Inventory*)                                  1       0 100.00%         1       0 100.00%
+Inventory::registerInventory(std::string const&, InventoryFactory*)         6       1  83.33%        11       4  63.64%
+Inventory::createInventory(std::string const&)                              4       0 100.00%         7       0 100.00%
+Inventory::insertInventory(std::string const&, Inventory*)                  4       1  75.00%         7       3  57.14%
+Inventory::getInventorySet(std::string const&)                              4       1  75.00%         9       5  44.44%
+Inventory::displayInventories()                                             5       0 100.00%         8       0 100.00%
+Inventory::deleteInventories()                                              3       0 100.00%         8       0 100.00%
+-----------------------------------------------------------------------------------------------------------------------
+TOTAL                                                                      41       4  90.24%        89      15  83.15%
+
+File '/home/NETID/fred2167/343/2021wi343b-movie-fred2167/main.cpp':
+Name                                                                  Regions    Miss   Cover     Lines    Miss   Cover
+-----------------------------------------------------------------------------------------------------------------------
+main                                                                        1       0 100.00%         6       0 100.00%
+-----------------------------------------------------------------------------------------------------------------------
+TOTAL                                                                       1       0 100.00%         6       0 100.00%
+
+File '/home/NETID/fred2167/343/2021wi343b-movie-fred2167/MediaType.cpp':
+Name                                                                         Regions    Miss   Cover     Lines    Miss   Cover
+------------------------------------------------------------------------------------------------------------------------------
+operator<<(std::ostream&, MediaType const&)                                        1       0 100.00%         1       0 100.00%
+operator>>(std::istream&, MediaType&)                                              1       0 100.00%         1       0 100.00%
+MediaType::hasStock()                                                              1       0 100.00%         1       0 100.00%
+MediaType::borrowItem()                                                            4       1  75.00%         8       2  75.00%
+MediaType::returnItem()                                                            1       0 100.00%         5       0 100.00%
+MediaType::getMediaTypeFactory()                                                   1       0 100.00%         4       0 100.00%
+MediaType::registerMediaTypeFactory(std::string const&, MediaTypeFactory*)         1       0 100.00%         3       0 100.00%
+MediaType::hasMediaTypeFactory(std::string const&)                                 1       0 100.00%         3       0 100.00%
+MediaType::createMediaType(std::string const&)                                     4       1  75.00%         7       3  57.14%
+------------------------------------------------------------------------------------------------------------------------------
+TOTAL                                                                             15       2  86.67%        33       5  84.85%
+
+File '/home/NETID/fred2167/343/2021wi343b-movie-fred2167/my_test.cpp':
+Name                                                                         Regions    Miss   Cover     Lines    Miss   Cover
+------------------------------------------------------------------------------------------------------------------------------
+testDVDInventory()                                                                 9       1  88.89%        24       3  87.50%
+testTransaction()                                                                  9       1  88.89%        21       3  85.71%
+testCustomer()                                                                     6       1  83.33%        14       3  78.57%
+testStore()                                                                        1       0 100.00%         8       0 100.00%
+myTestAll()                                                                        1       0 100.00%         6       0 100.00%
+------------------------------------------------------------------------------------------------------------------------------
+TOTAL                                                                             26       3  88.46%        73       9  87.67%
+
+File '/home/NETID/fred2167/343/2021wi343b-movie-fred2167/Person.cpp':
+Name                                                                         Regions    Miss   Cover     Lines    Miss   Cover
+------------------------------------------------------------------------------------------------------------------------------
+operator<<(std::ostream&, Person const&)                                           1       0 100.00%         1       0 100.00%
+operator>>(std::istream&, Person&)                                                 1       0 100.00%         1       0 100.00%
+Person::getPersonFactories()                                                       1       0 100.00%         6       0 100.00%
+Person::getId()                                                                    1       0 100.00%         1       0 100.00%
+Person::getName()                                                                  1       1   0.00%         1       1   0.00%
+Person::operator<(Person&)                                                         1       1   0.00%         1       1   0.00%
+Person::operator>(Person&)                                                         1       1   0.00%         1       1   0.00%
+Person::operator==(Person&)                                                        1       1   0.00%         1       1   0.00%
+Person::registerPersonFactory(std::string const&, PersonFactory*)                  1       0 100.00%         3       0 100.00%
+Person::hasPersonFactory(std::string const&)                                       1       0 100.00%         3       0 100.00%
+Person::createPerson(std::string const&)                                           4       1  75.00%         7       3  57.14%
+------------------------------------------------------------------------------------------------------------------------------
+TOTAL                                                                             14       5  64.29%        26       7  73.08%
+
+File '/home/NETID/fred2167/343/2021wi343b-movie-fred2167/Return.cpp':
+Name                                                                         Regions    Miss   Cover     Lines    Miss   Cover
+------------------------------------------------------------------------------------------------------------------------------
+ReturnFactory::ReturnFactory()                                                     1       0 100.00%         3       0 100.00%
+ReturnFactory::create() const                                                      1       0 100.00%         1       0 100.00%
+Return::read(std::istream&)                                                        3       0 100.00%        12       0 100.00%
+Return::printer(std::ostream&) const                                               4       1  75.00%         8       2  75.00%
+Return::~Return()                                                                  1       0 100.00%         4       0 100.00%
+Return::process(Store&)                                                           16       3  81.25%        53      10  81.13%
+------------------------------------------------------------------------------------------------------------------------------
+TOTAL                                                                             26       4  84.62%        81      12  85.19%
+
+File '/home/NETID/fred2167/343/2021wi343b-movie-fred2167/Store.cpp':
+Name                                                                                                             Regions    Miss   Cover     Lines    Miss   Cover
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Store::~Store()                                                                                                        1       0 100.00%         7       0 100.00%
+Store::readInventory(std::string const&, std::string const&)                                                           9       1  88.89%        23       3  86.96%
+Store::readCustomer(std::string const&)                                                                                6       1  83.33%        13       3  76.92%
+Store::readTransaction(std::string const&)                                                                            12       2  83.33%        28       6  78.57%
+Store::processTransaction(std::queue<Transaction*, std::deque<Transaction*, std::allocator<Transaction*> > >&)         5       0 100.00%        11       0 100.00%
+Store::hasCustomer(int)                                                                                                1       0 100.00%         4       0 100.00%
+Store::getCustomer(int)                                                                                                1       0 100.00%         4       0 100.00%
+Store::insertCustomer(int, Person*)                                                                                    1       0 100.00%         4       0 100.00%
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+TOTAL                                                                                                                 36       4  88.89%        94      12  87.23%
+
+File '/home/NETID/fred2167/343/2021wi343b-movie-fred2167/store_test.cpp':
+Name                                                                                                             Regions    Miss   Cover     Lines    Miss   Cover
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+testStore1()                                                                                                           3       0 100.00%        19       0 100.00%
+testStore2()                                                                                                           1       0 100.00%         4       0 100.00%
+testStoreFinal()                                                                                                       1       0 100.00%         6       0 100.00%
+testAll()                                                                                                              1       0 100.00%         5       0 100.00%
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+TOTAL                                                                                                                  6       0 100.00%        34       0 100.00%
+
+File '/home/NETID/fred2167/343/2021wi343b-movie-fred2167/Transaction.cpp':
+Name                                                                                                             Regions    Miss   Cover     Lines    Miss   Cover
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+operator<<(std::ostream&, Transaction const&)                                                                          1       0 100.00%         1       0 100.00%
+operator>>(std::istream&, Transaction&)                                                                                1       0 100.00%         1       0 100.00%
+Transaction::getTransactionFactory()                                                                                   1       0 100.00%         4       0 100.00%
+Transaction::registerTransactionFactory(std::string const&, TransactionFactory*)                                       1       0 100.00%         3       0 100.00%
+Transaction::hasTransactionFactory(std::string const&)                                                                 1       0 100.00%         3       0 100.00%
+Transaction::createTransaction(std::string const&)                                                                     4       0 100.00%         7       0 100.00%
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+TOTAL                                                                                                                  9       0 100.00%        19       0 100.00%
+
+File '/home/NETID/fred2167/343/2021wi343b-movie-fred2167/util.cpp':
+Name                                                                                                             Regions    Miss   Cover     Lines    Miss   Cover
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+util::readNextItem(std::istream&, char)                                                                                4       1  75.00%        10       2  80.00%
+util::eatGarbage(std::istream&, char)                                                                                  1       0 100.00%         4       0 100.00%
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+TOTAL                                                                                                                  5       1  80.00%        14       2  85.71%
+=====================================================
+The lines below were never executed
+=====================================================
+   30|      0|    return os;
+   31|      0|  }
+   30|      0|bool Classics::operator>(Inventory &rhs) {
+   31|      0|  auto &classics = dynamic_cast<Classics &>(rhs);
+   32|      0|  if (yearRelease != classics.yearRelease) {
+   33|      0|    return yearRelease > classics.yearRelease;
+   34|      0|  }
+   35|      0|  if (monthRelease != classics.monthRelease) {
+   36|      0|    return monthRelease > classics.monthRelease;
+   37|      0|  }
+   38|      0|  return majorActor > classics.majorActor;
+   39|      0|}
+   26|      0|bool Comedy::operator>(Inventory &rhs) {
+   27|      0|  auto &com = dynamic_cast<Comedy &>(rhs);
+   28|      0|  if (title != com.title) {
+   29|      0|    return title > com.title;
+   30|      0|  }
+   31|      0|  return yearRelease > com.yearRelease;
+   32|      0|}
+   24|      0|    return os;
+   25|      0|  }
+   32|      0|    return false;
+   33|      0|  }
+   27|      0|bool Drama::operator>(Inventory &rhs) {
+   28|      0|  auto &drama = dynamic_cast<Drama &>(rhs);
+   29|      0|  if (director != drama.director) {
+   30|      0|    return director > drama.director;
+   31|      0|  }
+   32|      0|  return title > drama.title;
+   33|      0|}
+   35|      0|bool Drama::operator==(Inventory &rhs) {
+   36|      0|  auto &drama = dynamic_cast<Drama &>(rhs);
+   37|      0|  return title == drama.title && director == drama.director;
+   38|      0|}
+   22|      0|    return;
+   23|      0|  }
+   24|      0|    return os;
+   25|      0|  }
+   32|      0|    return false;
+   33|      0|  }
+   37|      0|    cout << "**Invalid CustomerID** " << customerID << endl;
+   38|      0|    validFlag = false;
+   39|      0|    return false;
+   40|      0|  }
+   22|      0|  cout << "Do NOT has " << type << " to get stock.";
+   23|      0|  return nullptr;
+   24|      0|}
+   58|      0|    cout << "Inventory as type *" << type
+   59|      0|         << "* already exists. Register Failed." << endl;
+   60|      0|    return;
+   61|      0|  }
+   77|      0|    cout << "Don't know how to insert " << type << " as an Inventory." << endl;
+   78|      0|    return;
+   79|      0|  }
+   86|      0|    cout << "Don't know  " << type << " as an Inventory identifier." << endl;
+   87|      0|    // dummy stl;
+   88|      0|    static set<Inventory *, bool (*)(Inventory *, Inventory *)> s(compare);
+   89|      0|    return s;
+   90|      0|  }
+   15|      0|  return false;
+   16|      0|}
+   40|      0|    cout << "Don't know how to create " << type << " as a MediaType." << endl;
+   41|      0|    return nullptr;
+   42|      0|  }
+   15|      0|string Person::getName() { return name; }
+   17|      0|bool Person::operator<(Person &rhs) { return id < rhs.id; }
+   19|      0|bool Person::operator>(Person &rhs) { return id > rhs.id; }
+   21|      0|bool Person::operator==(Person &rhs) { return id == rhs.id; }
+   33|      0|    cout << "Don't know how to create " << type << "as an Person." << endl;
+   34|      0|    return nullptr;
+   35|      0|  }
+   31|      0|    return os;
+   32|      0|  }
+   45|      0|    return false;
+   46|      0|  }
+   70|      0|    cout << "**Not in Inventory** " << *this;
+   71|      0|    validFlag = false;
+   72|      0|    return false;
+   73|      0|  }
+   78|      0|    cout << "**Invalid MediaType** " << mediaType << " for " << *item;
+   79|      0|    validFlag = false;
+   80|      0|    return false;
+   81|      0|  }
+   14|      0|    cerr << "File cannot open!" << endl;
+   15|      0|    return;
+   16|      0|  }
+   38|      0|    cerr << "File cannot open!" << endl;
+   39|      0|    return;
+   40|      0|  }
+   53|      0|    cerr << "File cannot open!" << endl;
+   54|      0|    return q;
+   55|      0|  }
+   61|      0|      util::eatGarbage(ifs, '\n');
+   62|      0|      continue;
+   63|      0|    }
+   22|      0|    cerr << "File cannot open!" << endl;
+   23|      0|    return;
+   24|      0|  }
+   46|      0|    cerr << "File cannot open!" << endl;
+   47|      0|    return;
+   48|      0|  }
+   68|      0|    cerr << "File cannot open!" << endl;
+   69|      0|    return;
+   70|      0|  }
+    9|      0|    return str;
+   10|      0|  }
+Fri Mar 12 15:48:00 PST 2021
+=====================================================
+To create an output.txt file with all the output from this script
+Run the below command
+      ./create-output.sh > output.txt 2>&1 
+=====================================================
