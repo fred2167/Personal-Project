@@ -21,11 +21,20 @@ Customer::~Customer() {
   }
 }
 
-void Customer::displayCutomerHistory() {
+void Customer::displayCustomerHistory() {
   // display from reversed ordered
   for (auto iter = history.rbegin(); iter != history.rend(); iter++) {
     cout << **iter;
   }
+}
+
+bool Customer::hasBorrow(Inventory *inv) {
+  for (auto i : onLoan) {
+    if (i->getType() == inv->getType() && *i == *inv) {
+      return true;
+    }
+  }
+  return false;
 }
 
 void Customer::addToCustomerHistory(Transaction *t) { history.push_back(t); }
@@ -33,8 +42,13 @@ void Customer::addToCustomerHistory(Transaction *t) { history.push_back(t); }
 void Customer::addToOnLoan(Inventory *inv) { onLoan.push_back(inv); }
 
 void Customer::removeFromOnLoan(Inventory *inv) {
-  auto iter = util::find(onLoan.begin(), onLoan.end(), inv);
-  onLoan.erase(iter);
+  for (auto iter = onLoan.begin(); iter != onLoan.end(); iter++) {
+    auto onLoanPtr = *iter;
+    if (onLoanPtr->getType() == inv->getType() && *onLoanPtr == *inv) {
+      onLoan.erase(iter);
+      return;
+    }
+  }
 }
 
 void Customer::addToAlreadyReturn(Inventory *inv) {
@@ -49,8 +63,5 @@ istream &Customer::read(istream &is) {
 
 ostream &Customer::printer(ostream &os) const {
   os << id << ", " << name << endl;
-  for (Transaction *t : history) {
-    os << *t << endl;
-  }
   return os;
 }

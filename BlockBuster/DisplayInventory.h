@@ -20,7 +20,21 @@ private:
   ostream &printer(ostream &os) const override;
 
 public:
-  ~DisplayInventory() = default;
+  // copy not allowed
+  DisplayInventory(const DisplayInventory &rhs) = delete;
+
+  // move not allowed
+  DisplayInventory(DisplayInventory &&rhs) = delete;
+
+  // assignment not allowed
+  DisplayInventory &operator=(const DisplayInventory &rhs) = delete;
+
+  // move assignment not allowed
+  DisplayInventory &operator=(const DisplayInventory &&rhs) = delete;
+
+  DisplayInventory() = default;
+
+  ~DisplayInventory() override = default;
 
   bool process(Store &s) override;
 };

@@ -25,7 +25,21 @@ private:
   ostream &printer(ostream &os) const override;
 
 public:
-  ~History() = default;
+  // copy not allowed
+  History(const History &rhs) = delete;
+
+  // move not allowed
+  History(History &&rhs) = delete;
+
+  // assignment not allowed
+  History &operator=(const History &rhs) = delete;
+
+  // move assignment not allowed
+  History &operator=(const History &&rhs) = delete;
+
+  History() = default;
+
+  ~History() override = default;
 
   bool process(Store &s) override;
 };

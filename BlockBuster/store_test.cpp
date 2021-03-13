@@ -46,7 +46,7 @@ void testStoreFinal() {
 }
 
 void testAll() {
-  // testStore1();
-  // testStore2();
-  // testStoreFinal();
+  testStore1();
+  testStore2();
+  testStoreFinal();
 }

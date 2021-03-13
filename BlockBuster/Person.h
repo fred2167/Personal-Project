@@ -28,8 +28,8 @@ class Person {
   friend istream &operator>>(istream &is, Person &p);
 
 protected:
-  int id;
-  string name;
+  int id = 0;
+  string name = "";
 
 private:
   // read itself, remember to set stock, superclass will call this in operator>>
@@ -39,6 +39,20 @@ private:
   virtual ostream &printer(ostream &os) const = 0;
 
 public:
+  // copy not allowed
+  Person(const Person &rhs) = delete;
+
+  // move not allowed
+  Person(Person &&rhs) = delete;
+
+  // assignment not allowed
+  Person &operator=(const Person &rhs) = delete;
+
+  // move assignment not allowed
+  Person &operator=(const Person &&rhs) = delete;
+
+  Person() = default;
+
   virtual ~Person() = default;
 
   int getId();

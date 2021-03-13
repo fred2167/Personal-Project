@@ -14,6 +14,22 @@ public:
 class Comedy : public Movie {
 
 public:
+  // copy constructor as default
+  Comedy(const Comedy &rhs) = default;
+
+  // move not allowed
+  Comedy(Comedy &&rhs) = delete;
+
+  // assignment as default
+  Comedy &operator=(const Comedy &rhs) = default;
+
+  // move assignment not allowed
+  Comedy &operator=(const Comedy &&rhs) = delete;
+
+  Comedy();
+
+  ~Comedy() override = default;
+
   bool operator<(Inventory &rhs) override;
   bool operator>(Inventory &rhs) override;
   bool operator==(Inventory &rhs) override;

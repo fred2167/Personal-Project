@@ -31,6 +31,20 @@ private:
   ostream &printer(ostream &os) const override;
 
 public:
+  // copy not allowed
+  Borrow(const Borrow &rhs) = delete;
+
+  // move not allowed
+  Borrow(Borrow &&rhs) = delete;
+
+  // assignment not allowed
+  Borrow &operator=(const Borrow &rhs) = delete;
+
+  // move assignment not allowed
+  Borrow &operator=(const Borrow &&rhs) = delete;
+
+  Borrow() = default;
+
   ~Borrow() override;
 
   bool process(Store &s) override;

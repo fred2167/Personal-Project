@@ -56,4 +56,10 @@ H 1000
 H 1111
 H 5000
 H 8000
+R 8888 D C 3 1971 Ruth Gordon
+R 8888 D C 3 1971 Ruth Gordon
+R 8888 D C 3 1971 Ruth Gordon
 H 8888
+
+R 5858 D C 3 1971 Ruth Gordon
+B 5000 D V 3 1971 Ruth Gordon

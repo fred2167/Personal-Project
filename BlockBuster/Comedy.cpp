@@ -13,8 +13,10 @@ ComedyFactory comFactory;
 } // namespace
 //===========================================================
 
+Comedy::Comedy() { type = "F"; }
+
 bool Comedy::operator<(Inventory &rhs) {
-  Comedy &com = dynamic_cast<Comedy &>(rhs);
+  auto &com = dynamic_cast<Comedy &>(rhs);
   if (title != com.title) {
     return title < com.title;
   }
@@ -22,7 +24,7 @@ bool Comedy::operator<(Inventory &rhs) {
 }
 
 bool Comedy::operator>(Inventory &rhs) {
-  Comedy &com = dynamic_cast<Comedy &>(rhs);
+  auto &com = dynamic_cast<Comedy &>(rhs);
   if (title != com.title) {
     return title > com.title;
   }
@@ -30,7 +32,7 @@ bool Comedy::operator>(Inventory &rhs) {
 }
 
 bool Comedy::operator==(Inventory &rhs) {
-  Comedy &com = dynamic_cast<Comedy &>(rhs);
+  auto &com = dynamic_cast<Comedy &>(rhs);
   return title == com.title && yearRelease == com.yearRelease;
 }
 

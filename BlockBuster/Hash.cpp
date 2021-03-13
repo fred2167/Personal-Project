@@ -1,23 +1,23 @@
 #include "Hash.h"
 
-template <class T> Hash<T>::Hash() {
+Hash::Hash() {
   numBuckets = 10;
   table.reserve(10);
   for (int i = 0; i < numBuckets; i++) {
-    list<KeyValuePair> *l = new list<KeyValuePair>();
+    auto *l = new list<KeyValuePair>();
     table[i] = l;
   }
 }
-template <class T> Hash<T>::~Hash() {
+Hash::~Hash() {
   for (int i = 0; i < numBuckets; i++) {
-    for (auto iter = table[i]->begin(); iter != table[i]->end(); iter++) {
-      delete iter->second;
+    for (auto &pair : *table[i]) {
+      delete pair.second;
     }
     delete table[i];
   }
 }
 
-template <class T> void Hash<T>::insert(int key, T &value) {
+void Hash::insert(int key, Person *&value) {
   if (has(key)) {
     return;
   }
@@ -25,18 +25,17 @@ template <class T> void Hash<T>::insert(int key, T &value) {
   table[bucket]->push_front(make_pair(key, value));
 }
 
-template <class T> T Hash<T>::retrieve(int key) {
+Person *Hash::retrieve(int key) {
   int bucket = hashFn(key);
   for (auto &pair : *table[bucket]) {
     if (pair.first == key) {
       return pair.second;
     }
   }
-  T dummy;
-  return dummy;
+  return nullptr;
 }
 
-template <class T> bool Hash<T>::has(int key) {
+bool Hash::has(int key) {
   int bucket = hashFn(key);
   for (KeyValuePair &pair : *table[bucket]) {
     if (pair.first == key) {
@@ -46,4 +45,4 @@ template <class T> bool Hash<T>::has(int key) {
   return false;
 }
 
-template <class T> int Hash<T>::hashFn(int key) { return key % numBuckets; }
+int Hash::hashFn(int key) { return key % numBuckets; }

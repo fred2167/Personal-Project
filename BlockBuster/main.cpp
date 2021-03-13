@@ -11,7 +11,7 @@ void testAll();
 void myTestAll();
 
 int main() {
-  // testAll();
+  testAll();
   myTestAll();
   cout << "Done." << endl;
   return 0;

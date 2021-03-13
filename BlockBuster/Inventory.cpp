@@ -15,13 +15,6 @@ Inventory::~Inventory() {
 
 bool Inventory::hasMedia(string &type) { return stocks.count(type) > 0; }
 
-void Inventory::setMedia(string &type, int stock) {
-  if (hasMedia(type)) {
-    stocks.at(type)->setStock(stock);
-  } else {
-    cout << "Do NOT has " << type << " to set stock.";
-  }
-}
 MediaType *Inventory::getMedia(string &type) {
   if (hasMedia(type)) {
     return stocks.at(type);
@@ -29,6 +22,8 @@ MediaType *Inventory::getMedia(string &type) {
   cout << "Do NOT has " << type << " to get stock.";
   return nullptr;
 }
+
+const string &Inventory::getType() { return type; }
 
 void Inventory::registerMediaType(const string &type, MediaType *m) {
   stocks.emplace(type, m);

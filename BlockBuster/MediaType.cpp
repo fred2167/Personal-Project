@@ -21,13 +21,6 @@ bool MediaType::returnItem() {
   return true;
 }
 
-void MediaType::setStock(int stock) {
-  assert(stock > 0);
-  this->stock = stock;
-}
-
-int MediaType::getStock() { return stock; }
-
 map<string, MediaTypeFactory *> &MediaType::getMediaTypeFactory() {
   static map<string, MediaTypeFactory *> mediaTypeFactories;
   return mediaTypeFactories;

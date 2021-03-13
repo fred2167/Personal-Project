@@ -1,3 +1,4 @@
+#include "Person.h"
 #ifndef HASH_H
 #define HASH_H
 
@@ -6,20 +7,33 @@
 
 using namespace std;
 
-template <class T> class Hash {
+class Hash {
 
 public:
+  // copy not allowed
+  Hash(const Hash &rhs) = delete;
+
+  // move not allowed
+  Hash(Hash &&rhs) = delete;
+
+  // assignment not allowed
+  Hash &operator=(const Hash &rhs) = delete;
+
+  // move assignment not allowed
+  Hash &operator=(const Hash &&rhs) = delete;
+
   Hash();
+
   ~Hash();
 
-  void insert(int key, T &value);
+  void insert(int key, Person *&value);
 
-  T retrieve(int key);
+  Person *retrieve(int key);
 
   bool has(int key);
 
 private:
-  using KeyValuePair = pair<int, T>;
+  using KeyValuePair = pair<int, Person *>;
 
   vector<list<KeyValuePair> *> table;
   int numBuckets;

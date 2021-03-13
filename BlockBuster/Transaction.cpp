@@ -4,8 +4,6 @@ ostream &operator<<(ostream &os, const Transaction &t) { return t.printer(os); }
 
 istream &operator>>(istream &is, Transaction &t) { return t.read(is); }
 
-bool Transaction::getValidFlag() { return validFlag; }
-
 map<string, TransactionFactory *> &Transaction::getTransactionFactory() {
   static map<string, TransactionFactory *> transactionFactories;
   return transactionFactories;

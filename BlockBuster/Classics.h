@@ -14,10 +14,25 @@ public:
 class Classics : public Movie {
 
 protected:
-  int monthRelease;
-  string majorActor;
+  int monthRelease = 0;
+  string majorActor = "";
 
 public:
+  // copy constructor as default
+  Classics(const Classics &rhs) = default;
+  // move not allowed
+  Classics(Classics &&rhs) = delete;
+
+  // assignment as default
+  Classics &operator=(const Classics &rhs) = default;
+
+  // move assignment not allowed
+  Classics &operator=(const Classics &&rhs) = delete;
+
+  Classics();
+
+  ~Classics() override = default;
+
   bool operator<(Inventory &rhs) override;
   bool operator>(Inventory &rhs) override;
   bool operator==(Inventory &rhs) override;

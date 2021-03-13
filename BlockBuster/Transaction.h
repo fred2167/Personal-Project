@@ -28,14 +28,24 @@ private:
   virtual ostream &printer(ostream &os) const = 0;
 
 public:
+  // copy not allowed
+  Transaction(const Transaction &rhs) = delete;
+
+  // move not allowed
+  Transaction(Transaction &&rhs) = delete;
+
+  // assignment not allowed
+  Transaction &operator=(const Transaction &rhs) = delete;
+
+  // move assignment not allowed
+  Transaction &operator=(const Transaction &&rhs) = delete;
+
+  Transaction() = default;
+
   virtual ~Transaction() = default;
 
   // call in class store
   virtual bool process(Store &s) = 0;
-
-  //====================Getter=======================================
-
-  bool getValidFlag();
 
   //====================Factory======================================
   /* this method ensure transactionFactories is created before main

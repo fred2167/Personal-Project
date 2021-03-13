@@ -32,7 +32,7 @@ void testDVDInventory() {
       inv->registerMediaType("D", m);
       util::eatGarbage(ifs, ',');
       ifs >> *inv;
-      cout << *inv;
+      // cout << *inv;
       delete inv;
     } else {
       string discard;
@@ -53,7 +53,7 @@ void testTransaction() {
     if (t != nullptr) {
 
       ifs >> *t;
-      cout << *t;
+      // cout << *t;
       delete t;
     } else {
       string discard;
@@ -87,9 +87,9 @@ void testStore() {
 }
 
 void myTestAll() {
-  // testDVDInventory();
-  // testTransaction();
-  // testCustomer();
+  testDVDInventory();
+  testTransaction();
+  testCustomer();
   testStore();
 }
 

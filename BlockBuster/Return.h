@@ -28,6 +28,19 @@ private:
   ostream &printer(ostream &os) const override;
 
 public:
+  // copy not allowed
+  Return(const Return &rhs) = delete;
+  // move not allowed
+  Return(Return &&rhs) = delete;
+
+  // assignment not allowed
+  Return &operator=(const Return &rhs) = delete;
+
+  // move assignment not allowed
+  Return &operator=(const Return &&rhs) = delete;
+
+  Return() = default;
+
   ~Return() override;
 
   bool process(Store &s) override;

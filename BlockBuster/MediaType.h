@@ -33,22 +33,34 @@ protected:
   int onLoan = 0;
   //====================Virtual Function =============================
 public:
+  // copy constructor as default
+  MediaType(const MediaType &rhs) = default;
+
+  // move not allowed
+  MediaType(MediaType &&rhs) = delete;
+
+  // assignment as default
+  MediaType &operator=(const MediaType &rhs) = default;
+
+  // move assignment not allowed
+  MediaType &operator=(const MediaType &&rhs) = delete;
+
+  MediaType() = default;
+
+  virtual ~MediaType() = default;
+
   // read itself, superclass will call this in operator>>
   virtual istream &read(istream &is) = 0;
 
   // print yourself, superclass will call operator<< on this function
   virtual ostream &printer(ostream &os) const = 0;
 
-  virtual ~MediaType() = default;
   //====================Getter/ Setter=================================
 
   // stock manipulation
   bool hasStock();
   bool borrowItem(); // decrement stock by 1
   bool returnItem(); // increment stock by 1
-
-  void setStock(int stock);
-  int getStock();
 
   //====================Factory=======================================
   /* this method ensure movieFactories is created before main

@@ -14,8 +14,10 @@ DramaFactory dramaFactory;
 } // namespace
 //===========================================================
 
+Drama::Drama() { type = "D"; }
+
 bool Drama::operator<(Inventory &rhs) {
-  Drama &drama = dynamic_cast<Drama &>(rhs);
+  auto &drama = dynamic_cast<Drama &>(rhs);
   if (director != drama.director) {
     return director < drama.director;
   }
@@ -23,7 +25,7 @@ bool Drama::operator<(Inventory &rhs) {
 }
 
 bool Drama::operator>(Inventory &rhs) {
-  Drama &drama = dynamic_cast<Drama &>(rhs);
+  auto &drama = dynamic_cast<Drama &>(rhs);
   if (director != drama.director) {
     return director > drama.director;
   }
@@ -31,7 +33,7 @@ bool Drama::operator>(Inventory &rhs) {
 }
 
 bool Drama::operator==(Inventory &rhs) {
-  Drama &drama = dynamic_cast<Drama &>(rhs);
+  auto &drama = dynamic_cast<Drama &>(rhs);
   return title == drama.title && director == drama.director;
 }
 

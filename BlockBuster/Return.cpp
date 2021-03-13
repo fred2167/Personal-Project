@@ -52,7 +52,15 @@ bool Return::process(Store &s) {
     return false;
   }
   Person *p = s.getCustomer(customerID);
-  Customer *c = dynamic_cast<Customer *>(p);
+  auto *c = dynamic_cast<Customer *>(p);
+
+  // Check if customer has borrow the item
+  if (!c->hasBorrow(toReturn)) {
+    cout << "**Customer " << customerID << " NOT borrow** ";
+    toReturn->transactionPrinter(cout);
+    validFlag = false;
+    return false;
+  }
 
   // retrieve inventoty
   auto &inventorySet = Inventory::getInventorySet(movieType);

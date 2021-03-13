@@ -21,6 +21,20 @@ class Transaction;
 class Store {
 
 public:
+  // copy not allowed
+  Store(const Store &rhs) = delete;
+
+  // move not allowed
+  Store(Store &&rhs) = delete;
+
+  // assignment not allowed
+  Store &operator=(const Store &rhs) = delete;
+
+  // move assignment not allowed
+  Store &operator=(const Store &&rhs) = delete;
+
+  Store() = default;
+
   ~Store();
 
   void readInventory(const string &fileName, const string &mediaType);
@@ -39,8 +53,7 @@ public:
 
 private:
   // map<int, Person *> customers;
-  Hash<Person *> customers;
+  Hash customers;
 };
 
-#include "Hash.cpp"
 #endif

@@ -27,7 +27,7 @@ ostream &DisplayInventory::printer(ostream &os) const {
   return os;
 }
 
-bool DisplayInventory::process(Store &s) {
+bool DisplayInventory::process(Store & /*s*/) {
   if (!validFlag) {
     return false;
   }

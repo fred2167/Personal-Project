@@ -39,10 +39,10 @@ bool History::process(Store &s) {
     return false;
   }
   Person *p = s.getCustomer(customerID);
-  Customer *c = dynamic_cast<Customer *>(p);
+  auto *c = dynamic_cast<Customer *>(p);
 
   cout << *this;
-  c->displayCutomerHistory();
+  c->displayCustomerHistory();
 
   // return false so store process will delete transaction after process
   return false;

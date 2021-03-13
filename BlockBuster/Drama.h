@@ -14,6 +14,22 @@ public:
 class Drama : public Movie {
 
 public:
+  // copy constructor as default
+  Drama(const Drama &rhs) = default;
+
+  // move not allowed
+  Drama(Drama &&rhs) = delete;
+
+  // assignment as default
+  Drama &operator=(const Drama &rhs) = default;
+
+  // move assignment not allowed
+  Drama &operator=(const Drama &&rhs) = delete;
+
+  Drama();
+
+  ~Drama() override = default;
+
   bool operator<(Inventory &rhs) override;
   bool operator>(Inventory &rhs) override;
   bool operator==(Inventory &rhs) override;

@@ -14,34 +14,32 @@ ClassicsFactory classicsFactory;
 } // namespace
 //===========================================================
 
+Classics::Classics() { type = "C"; }
+
 bool Classics::operator<(Inventory &rhs) {
-  Classics &classics = dynamic_cast<Classics &>(rhs);
+  auto &classics = dynamic_cast<Classics &>(rhs);
   if (yearRelease != classics.yearRelease) {
     return yearRelease < classics.yearRelease;
-
-  } else if (monthRelease != classics.monthRelease) {
-    return monthRelease < classics.monthRelease;
-
-  } else {
-    return majorActor < classics.majorActor;
   }
+  if (monthRelease != classics.monthRelease) {
+    return monthRelease < classics.monthRelease;
+  }
+  return majorActor < classics.majorActor;
 }
 
 bool Classics::operator>(Inventory &rhs) {
-  Classics &classics = dynamic_cast<Classics &>(rhs);
+  auto &classics = dynamic_cast<Classics &>(rhs);
   if (yearRelease != classics.yearRelease) {
     return yearRelease > classics.yearRelease;
-
-  } else if (monthRelease != classics.monthRelease) {
-    return monthRelease > classics.monthRelease;
-
-  } else {
-    return majorActor > classics.majorActor;
   }
+  if (monthRelease != classics.monthRelease) {
+    return monthRelease > classics.monthRelease;
+  }
+  return majorActor > classics.majorActor;
 }
 
 bool Classics::operator==(Inventory &rhs) {
-  Classics &classics = dynamic_cast<Classics &>(rhs);
+  auto &classics = dynamic_cast<Classics &>(rhs);
   return monthRelease == classics.monthRelease &&
          yearRelease == classics.yearRelease &&
          majorActor == classics.majorActor;

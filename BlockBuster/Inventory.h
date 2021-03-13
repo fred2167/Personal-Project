@@ -39,6 +39,8 @@ protected:
   // Transaction are deleted in customer class.
   vector<Transaction *> histories;
 
+  string type = "";
+
 private:
   //====================Virtual Function =============================
 
@@ -49,6 +51,23 @@ private:
   virtual ostream &printer(ostream &os) const = 0;
 
 public:
+  // copy constructor as default
+  Inventory(const Inventory &rhs) = default;
+
+  // move not allowed
+  Inventory(Inventory &&rhs) = delete;
+
+  // assignment as default
+  Inventory &operator=(const Inventory &rhs) = default;
+
+  // move assignment not allowed
+  Inventory &operator=(const Inventory &&rhs) = delete;
+
+  Inventory() = default;
+
+  // sub-class may override destructor, remember to delete stocks
+  virtual ~Inventory();
+
   // read for transaction. when creating a transaction, it will also create a
   // dummyInventory. Use dummyInventory to find actual inventory to manipulate
   // stock
@@ -61,13 +80,12 @@ public:
   virtual bool operator>(Inventory &rhs) = 0;
   virtual bool operator==(Inventory &rhs) = 0;
 
-  // sub-class may override destructor, remember to delete stocks
-  virtual ~Inventory();
   //====================Getter/ Setter=================================
 
   bool hasMedia(string &type);
-  void setMedia(string &type, int stock);
   MediaType *getMedia(string &type);
+
+  const string &getType();
 
   // register stock of different media type after create inventory
   void registerMediaType(const string &type, MediaType *m);

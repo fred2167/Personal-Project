@@ -1,6 +1,7 @@
 #ifndef CUSTOMER_H
 #define CUSTOMER_H
 
+#include "Borrow.h"
 #include "Inventory.h"
 #include "Person.h"
 #include "Transaction.h"
@@ -26,9 +27,25 @@ protected:
   vector<Inventory *> alreadyReturn;
 
 public:
+  // copy not allowed
+  Customer(const Customer &rhs) = delete;
+
+  // move not allowed
+  Customer(Customer &&rhs) = delete;
+
+  // assignment not allowed
+  Customer &operator=(const Customer &rhs) = delete;
+
+  // move assignment not allowed
+  Customer &operator=(const Customer &&rhs) = delete;
+
+  Customer() = default;
+
   ~Customer() override;
 
-  void displayCutomerHistory();
+  void displayCustomerHistory();
+
+  bool hasBorrow(Inventory *inv);
 
   void addToCustomerHistory(Transaction *t);
 
