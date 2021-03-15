@@ -16,15 +16,18 @@
 
 - Inventories(Movies) are also stored the same as factories with self-registering feature.
 
-- Inventory -> Movie -> Comedy
-                     -> Classical
-                     -> Drama
+- Inventory 
+  - Movie
+    - Comedy
+    - Classical
+    - Drama
 
 - MediaType -> DVD
 
 - Person -> Customer
 
-- Transaction -> Return
-              -> Borrow
-              -> History
-              -> DisplayInventory
+- Transaction 
+  - Return
+  - Borrow
+  - History
+  - DisplayInventory
