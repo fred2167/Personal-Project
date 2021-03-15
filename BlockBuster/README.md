@@ -24,7 +24,7 @@
 
 - Person -> Customer
 
-- Transaction -> Return
-              -> Borrow
-              -> History
-              -> DisplayInventory
+- Transaction -  Return
+              -  Borrow
+              -  History
+              -  DisplayInventory
