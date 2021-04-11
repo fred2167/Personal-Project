@@ -6,6 +6,7 @@ import random
 import time
 import numpy as np
 from tqdm import tqdm, trange
+import wandb
 
 
 
@@ -46,7 +47,7 @@ class Solver(object):
     Using NVDIA GPU, Cuda, Cudnn
   '''
 
-  def __init__(self, model, train_loader, val_loader, optimizer, lr_scheduler= None, check_every_epoch=2, random_seed=0):
+  def __init__(self, model, train_loader, val_loader, optimizer, lr_scheduler= None, check_every_epoch=1, random_seed=0):
     '''
     Inputs:
       - optimizer:          Standard Pytorch optimizer. Will ignore preset learning rate of the optimizer and set new learning rate at *train*
@@ -62,6 +63,8 @@ class Solver(object):
     self.optimizer = optimizer
     self.lr_scheduler = lr_scheduler
     self.scaler = amp.GradScaler()
+
+
 
 
     # Book keeping variables
@@ -112,6 +115,9 @@ class Solver(object):
 
     if hparam:
       writer = SummaryWriter('runs/'+model_start_time)
+      self.track = wandb.init(config=hparam)
+      wandb.watch(self.model)
+
 
     
     checkpoint_cycle_flag = True
@@ -180,10 +186,13 @@ class Solver(object):
         self.stats['train_acc'].append(train_accuracy)
         self.stats['val_acc'].append(val_accuracy)
         self.stats['ratio'].append(ratio)
+
+        
         
         if hparam:
           writer.add_scalar('Epoch loss', avg_loss, i)
           writer.add_scalars('accuracy', {'train': train_accuracy,'val':val_accuracy}, i)
+          wandb.log({"train loss": avg_loss, "val loss": val_loss,"train acc": train_accuracy, "val acc": val_accuracy})
 
           # only save model checkpoint after half of the training process
           if i > epoch//2:
@@ -284,6 +293,11 @@ class Solver(object):
     PATH = f'runs/{model_start_time}/{model_start_time}_epoch_{epoch}_val_{val_acc:.4f}.tar'
 
     torch.save(checkpoint, PATH)
+
+    # weights and biases tracking
+    artifact = wandb.Artifact("model", type='model_state')
+    artifact.add_file(PATH)
+    self.track.log_artifact(artifact)
 
   @staticmethod
   def _load_check_point(INSTANCE, PATH, model, train_loader, val_loader, optimizer, lr, lr_scheduler= None):

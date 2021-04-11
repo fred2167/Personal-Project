@@ -11,6 +11,7 @@ from Optim import AdaBelief
 
 
 
+
 transformer = transform.Compose([
                                 transform.Resize(256),
                                 transform.CenterCrop(224),
@@ -42,7 +43,7 @@ to_float_cuda = {"dtype": torch.float32, "device":"cuda"}
 
 fi = 0
 lr = 8e-3
-epoch = 50
+epoch = 10
 model = efficientNet(fi=fi, num_classes=10)
 model = model.to(**to_float_cuda)
 
