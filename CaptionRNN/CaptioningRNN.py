@@ -1,4 +1,3 @@
-
 import tensorboard
 import torch
 import torch.nn as nn
@@ -28,7 +27,7 @@ class CocoCaptionDataset(torch.utils.data.Dataset):
 
 class CocoCaptionsLT(pl.LightningDataModule):
 
-    def __init__(self, folder_path, batch_size=64, worker=6, caption_idx=1, transformer=None):
+    def __init__(self, folder_path, batch_size=64, worker=6, caption_idx=2, transformer=None):
         '''
         Input:
           folder_path: A folder that contains both train and validation images and annotation (.json)
@@ -60,7 +59,7 @@ class CocoCaptionsLT(pl.LightningDataModule):
 
             if self.transformer is None:
                 self.transformer = transforms.Compose([
-                    transforms.Resize(112),
+                    transforms.Resize((112, 112)),
                     transforms.ToTensor()
                 ])
 
@@ -75,8 +74,10 @@ class CocoCaptionsLT(pl.LightningDataModule):
             print('Load fail. Build dataset from scratch. This will take a while!!')
             self.vocab_to_idx, self.idx_to_vocab = self._create_vocab_idx_mapping(
                 self.train_dataset, self.caption_idx)
+
             self.train_dataset = self._tokenize_captions(
                 self.train_dataset, self.caption_idx, self.vocab_to_idx)
+
             self.val_dataset = self._tokenize_captions(
                 self.val_dataset, self.caption_idx, self.vocab_to_idx)
 
@@ -85,6 +86,8 @@ class CocoCaptionsLT(pl.LightningDataModule):
                               "train_dataset": self.train_dataset,
                               "val_dataset": self.val_dataset,
                               'vocab_count': self.vocab_count}
+
+            print('saving dataset....')
             torch.save(self.data_dict, os.path.join(self.folder_path,
                        f'coco2017_caption{self.caption_idx}_data_dict'))
         else:
@@ -240,7 +243,7 @@ class CocoCaptionsLT(pl.LightningDataModule):
 
 class CaptioningRNN(pl.LightningModule):
 
-    def __init__(self, lr=3e-4, img_size=2048, time_stamps=16, hidden_size=512, vocab_vec_size=128, vocab_size=1000):
+    def __init__(self, lr=1e-3, img_size=2048, time_stamps=16, hidden_size=512, vocab_vec_size=128, vocab_size=1000):
 
         super().__init__()
         self.hparams = {'lr': lr}
@@ -374,13 +377,13 @@ if __name__ == '__main__':
     parser.add_argument('--epoch', type=int, default=None, help='number of max epoch for training')
 
     args = parser.parse_args()
+
     folder_path = "/home/fred/datasets/coco/"
     DataModule = CocoCaptionsLT(folder_path, batch_size = args.batch_size, worker=args.worker)
 
 
     model = CaptioningRNN()
     trainer = pl.Trainer(gpus = 1, precision=16, max_epochs=args.epoch)
-
 
     trainer.fit(model, DataModule)
 
