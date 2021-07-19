@@ -11,6 +11,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 from tqdm import tqdm
+import argparse
 
 
 class CocoCaptionDataset(torch.utils.data.Dataset):
@@ -27,7 +28,7 @@ class CocoCaptionDataset(torch.utils.data.Dataset):
 
 class CocoCaptionsLT(pl.LightningDataModule):
 
-    def __init__(self, folder_path, batch_size=64, caption_idx=1, transformer=None):
+    def __init__(self, folder_path, batch_size=64, worker=6, caption_idx=1, transformer=None):
         '''
         Input:
           folder_path: A folder that contains both train and validation images and annotation (.json)
@@ -42,6 +43,7 @@ class CocoCaptionsLT(pl.LightningDataModule):
         self.batch_size = batch_size
         self.caption_idx = caption_idx
         self.transformer = transformer
+        self.worker = worker
 
         try:
             print(f'Loading coco2017_caption{self.caption_idx}_data_dict')
@@ -95,12 +97,12 @@ class CocoCaptionsLT(pl.LightningDataModule):
 
     def train_dataloader(self):
         trainDataLoader = torch.utils.data.DataLoader(self.train_dataset, self.batch_size,
-                                                      shuffle=True, num_workers=6, pin_memory=True)
+                                                      shuffle=True, num_workers=self.worker, pin_memory=True)
         return trainDataLoader
 
     def val_dataloader(self):
         valDataLoader = torch.utils.data.DataLoader(self.val_dataset, self.batch_size,
-                                                    shuffle=False, num_workers=6, pin_memory=True)
+                                                    shuffle=False, num_workers=self.worker, pin_memory=True)
         return valDataLoader
 
     def sample(self, num_samples=4):
@@ -366,12 +368,18 @@ if __name__ == '__main__':
 
     pl.seed_everything(1234)
 
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--batch_size', type=int, default=512, help='size of each batch for train and validation dataloader')
+    parser.add_argument('--worker', type=int, default=0, help='number of workers for dataloader')
+    parser.add_argument('--epoch', type=int, default=None, help='number of max epoch for training')
+
+    args = parser.parse_args()
     folder_path = "/home/fred/datasets/coco/"
-    DataModule = CocoCaptionsLT(folder_path, batch_size = 512)
+    DataModule = CocoCaptionsLT(folder_path, batch_size = args.batch_size, worker=args.worker)
 
 
     model = CaptioningRNN()
-    trainer = pl.Trainer(gpus = 1, precision=16, max_epochs=20)
+    trainer = pl.Trainer(gpus = 1, precision=16, max_epochs=args.epoch)
 
 
     trainer.fit(model, DataModule)
